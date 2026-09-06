@@ -1,11 +1,8 @@
 import { Router } from "express";
+import { getHello } from "../controllers/hello.controller.js";
 
 const router = Router();
 
-router.get("/hello", (_request, response) => {
-  response.json({
-    message: "Hello from Dear Stranger's API!",
-  });
-});
+router.get("/hello", getHello);
 
 export default router;
