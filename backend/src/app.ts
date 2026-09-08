@@ -1,11 +1,15 @@
 import express from "express";
-import helloRouter from "./routes/hello.routes.js";
-import statusRouter from "./routes/status.routes.js";
-import testRouter from "./routes/test.routes.js";
+import cookieParser from "cookie-parser";
+import authRouter from "./modules/auth/auth.routes.js";
+import letterRouter from "./modules/letters/letter.routes.js";
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+
+app.use("/api/auth", authRouter);
+app.use("/api/letters", letterRouter);
 
 app.use((_request, _response, next) => {
   console.log("Request received");
@@ -14,7 +18,4 @@ app.use((_request, _response, next) => {
 
 
 
-app.use("/api", helloRouter);
-app.use("/api", statusRouter);
-app.use("/api", testRouter);
 export default app;

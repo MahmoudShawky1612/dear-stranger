@@ -1,0 +1,20 @@
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Generated Prisma client
+src/generated/prisma/
+
+# Build output
+dist/
+
+# Local development / AI tooling
+.agents/
+.claude/
+.windsurf/
+
+# Local test/session data
+cookies.txt

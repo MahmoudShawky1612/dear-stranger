@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id               Int      @id @default(autoincrement())
+  username         String   @unique
+  email            String   @unique
+  passwordHash     String   @map("password_hash")
+  displayName      String?  @map("display_name")
+  bio              String?
+  avatarUrl        String?  @map("avatar_url")
+  location         String?
+  favoriteMedium   String?  @map("favorite_medium")
+  currentlyDrawing String?  @map("currently_drawing")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  sentLetters    Letter[]  @relation("sentLetters")
+  claimedLetters Letter[]  @relation("claimedLetters")
+  sessions       Session[]
+  artworkUploads ArtworkUpload[]
+
+  @@map("users")
+}
+
+enum LetterStatus {
+  AVAILABLE
+  CLAIMED
+  DELIVERED
+}
+
+model Letter {
+  id              Int          @id @default(autoincrement())
+  senderId        Int          @map("sender_id")
+  artistId        Int?         @map("artist_id")
+  title           String
+  message         String
+  status          LetterStatus @default(AVAILABLE)
+  isAnonymous     Boolean      @default(false) @map("is_anonymous")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  claimedAt       DateTime?    @map("claimed_at")
+  deliveredAt     DateTime?    @map("delivered_at")
+
+  sender   User     @relation("sentLetters", fields: [senderId], references: [id])
+  artist   User?    @relation("claimedLetters", fields: [artistId], references: [id])
+  artwork  Artwork?
+  artworkUploads ArtworkUpload[]
+
+  @@index([status, createdAt])
+  @@index([senderId, createdAt])
+  @@index([artistId, status])
+  @@map("letters")
+}
+
+model Artwork {
+  id             Int       @id @default(autoincrement())
+  letterId       Int       @unique @map("letter_id")
+  storageKey     String    @unique @map("storage_key")
+  contentType    String    @map("content_type")
+  fileSizeBytes  Int       @map("file_size_bytes")
+  isAnonymous    Boolean   @default(false) @map("is_anonymous")
+  isPublished    Boolean   @default(false) @map("is_published")
+  publishedAt    DateTime? @map("published_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  letter Letter @relation(fields: [letterId], references: [id], onDelete: Cascade)
+
+  @@map("artworks")
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  userId     Int      @map("user_id")
+  tokenHash  String   @unique @map("token_hash")
+  expiresAt  DateTime @map("expires_at")
+  lastUsedAt DateTime @default(now()) @map("last_used_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model ArtworkUpload {
+  id             Int       @id @default(autoincrement())
+  letterId       Int       @map("letter_id")
+  artistId       Int       @map("artist_id")
+  storageKey     String    @unique @map("storage_key")
+  contentType    String    @map("content_type")
+  expectedSize   Int       @map("expected_size")
+  expiresAt      DateTime  @map("expires_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  letter Letter @relation(fields: [letterId], references: [id], onDelete: Cascade)
+  artist User   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@index([letterId, artistId])
+  @@index([expiresAt])
+  @@map("artwork_uploads")
+}
