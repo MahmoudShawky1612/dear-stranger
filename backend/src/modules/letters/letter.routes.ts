@@ -10,6 +10,8 @@ import {
   getLetterController,
   getMySentLettersController,
   getMyClaimedLettersController,
+  getArtworkAccessUrlController,
+  publishArtworkController
 } from "./letter.controller.js";
 
 const router = Router();
@@ -52,4 +54,15 @@ router.post(
   createReplyController,
 );
 
+router.get(
+  "/artwork/:artworkId/url",
+  requireAuthentication,
+  getArtworkAccessUrlController,
+);
 export default router;
+
+router.post(
+  "/:id/artwork/publish",
+  requireAuthentication,
+  publishArtworkController,
+);

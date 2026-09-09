@@ -16,9 +16,10 @@ import type {
 } from "./avatar.schema.js";
 import { UserNotFoundError } from "./user.service.js";
 
-const bucketName = process.env["B2_BUCKET_NAME"];
-if (!bucketName) {
-  throw new Error("Missing B2_BUCKET_NAME environment variable");
+const avatarBucketName = process.env["B2_AVATAR_BUCKET_NAME"];
+
+if (!avatarBucketName) {
+  throw new Error("Missing B2_AVATAR_BUCKET_NAME environment variable");
 }
 
 const UPLOAD_URL_TTL_SECONDS = 10 * 60;
@@ -54,7 +55,7 @@ export const createAvatarUploadUrl = async (
   const storageKey = `avatars/${userId}/${randomUUID()}.${extension}`;
 
   const command = new PutObjectCommand({
-    Bucket: bucketName,
+    Bucket: avatarBucketName,
     Key: storageKey,
     ContentType: input.contentType,
   });
@@ -89,7 +90,7 @@ export const completeAvatarUpload = async (
   try {
     const result = await b2.send(
       new HeadObjectCommand({
-        Bucket: bucketName,
+        Bucket: avatarBucketName,
         Key: input.storageKey,
       }),
     );
@@ -120,7 +121,7 @@ export const completeAvatarUpload = async (
       try {
         await b2.send(
           new DeleteObjectCommand({
-            Bucket: bucketName,
+            Bucket: avatarBucketName,
             Key: oldKey,
           }),
         );
@@ -156,7 +157,7 @@ export const removeAvatar = async (userId: number) => {
       try {
         await b2.send(
           new DeleteObjectCommand({
-            Bucket: bucketName,
+            Bucket: avatarBucketName,
             Key: key,
           }),
         );

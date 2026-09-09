@@ -7,7 +7,11 @@ import {
   getMySentLetters,
   getMyClaimedLetters,
 } from "./letter.service.js";
-
+import {
+  ArtworkAccessDeniedError,
+  ArtworkNotFoundError,
+  getArtworkAccessUrl,
+} from "./artwork.access.service.js";
 import {
   createReply,
   getLetterById,
@@ -15,6 +19,13 @@ import {
   LetterNotDeliveredError,
   NotParticipantError,
 } from "./reply.service.js";
+
+import {
+  publishArtwork,
+  ArtworkPublishNotAllowedError,
+  ArtworkAlreadyPublishedError,
+} from "./artwork.publish.service.js";
+
 import { createReplySchema } from "./reply.schema.js";
 
 import { createArtworkUploadSchema } from "./artwork.schema.js";
@@ -566,5 +577,117 @@ export const getMyClaimedLettersController = async (
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+export const getArtworkAccessUrlController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const userId = request.auth?.userId;
+
+  if (!userId) {
+    response.status(401).json({
+      error: "Authentication required",
+    });
+    return;
+  }
+
+  const artworkId = Number(request.params["artworkId"]);
+
+  if (!Number.isInteger(artworkId) || artworkId <= 0) {
+    response.status(400).json({
+      error: "Invalid artwork ID",
+    });
+    return;
+  }
+
+  try {
+    const result = await getArtworkAccessUrl(artworkId, userId);
+
+    response.status(200).json(result);
+  } catch (error) {
+    if (error instanceof ArtworkNotFoundError) {
+      response.status(404).json({
+        error: error.message,
+      });
+      return;
+    }
+
+    if (error instanceof ArtworkAccessDeniedError) {
+      response.status(403).json({
+        error: error.message,
+      });
+      return;
+    }
+
+    console.error(error);
+
+    response.status(500).json({
+      error: "Something went wrong",
+    });
+  }
+};
+
+export const publishArtworkController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const artistId = request.auth?.userId;
+
+  if (!artistId) {
+    response.status(401).json({
+      error: "Authentication required",
+    });
+    return;
+  }
+
+  const letterId = Number(request.params["id"]);
+
+  if (!Number.isInteger(letterId) || letterId <= 0) {
+    response.status(400).json({
+      error: "Invalid letter ID",
+    });
+    return;
+  }
+
+  try {
+    const artwork = await publishArtwork(letterId, artistId);
+
+    response.status(200).json({
+      artwork: {
+        id: artwork.id,
+        letterId: artwork.letterId,
+        isPublished: artwork.isPublished,
+        publishedAt: artwork.publishedAt,
+      },
+    });
+  } catch (error) {
+    if (error instanceof ArtworkNotFoundError) {
+      response.status(404).json({
+        error: error.message,
+      });
+      return;
+    }
+
+    if (error instanceof ArtworkPublishNotAllowedError) {
+      response.status(403).json({
+        error: error.message,
+      });
+      return;
+    }
+
+    if (error instanceof ArtworkAlreadyPublishedError) {
+      response.status(409).json({
+        error: error.message,
+      });
+      return;
+    }
+
+    console.error(error);
+
+    response.status(500).json({
+      error: "Something went wrong",
+    });
   }
 };
