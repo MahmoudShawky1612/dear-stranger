@@ -5,26 +5,34 @@ import {
   completeArtworkDeliveryController,
   createArtworkUploadUrlController,
   createLetterController,
+  createReplyController,
   getAvailableLettersController,
+  getLetterController,
+  getMySentLettersController,
+  getMyClaimedLettersController,
 } from "./letter.controller.js";
+
 const router = Router();
 
+router.get("/", getAvailableLettersController);
+
 router.get(
-  "/",
-  getAvailableLettersController,
+  "/mine/sent",
+  requireAuthentication,
+  getMySentLettersController,
 );
 
-router.post(
-  "/",
+router.get(
+  "/mine/claimed",
   requireAuthentication,
-  createLetterController,
+  getMyClaimedLettersController,
 );
 
-router.post(
-  "/:id/claim",
-  requireAuthentication,
-  claimLetterController,
-);
+router.post("/", requireAuthentication, createLetterController);
+
+router.get("/:id", requireAuthentication, getLetterController);
+
+router.post("/:id/claim", requireAuthentication, claimLetterController);
 
 router.post(
   "/:id/artwork/upload-url",
@@ -36,6 +44,12 @@ router.post(
   "/:id/artwork/complete",
   requireAuthentication,
   completeArtworkDeliveryController,
+);
+
+router.post(
+  "/:id/replies",
+  requireAuthentication,
+  createReplyController,
 );
 
 export default router;

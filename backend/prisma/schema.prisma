@@ -24,6 +24,7 @@ model User {
   claimedLetters Letter[]  @relation("claimedLetters")
   sessions       Session[]
   artworkUploads ArtworkUpload[]
+  replies        Reply[]
 
   @@map("users")
 }
@@ -50,6 +51,7 @@ model Letter {
   artist   User?    @relation("claimedLetters", fields: [artistId], references: [id])
   artwork  Artwork?
   artworkUploads ArtworkUpload[]
+  replies        Reply[]
 
   @@index([status, createdAt])
   @@index([senderId, createdAt])
@@ -104,4 +106,18 @@ model ArtworkUpload {
   @@index([letterId, artistId])
   @@index([expiresAt])
   @@map("artwork_uploads")
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  letterId  Int      @map("letter_id")
+  authorId  Int      @map("author_id")
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  letter Letter @relation(fields: [letterId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([letterId, createdAt])
+  @@map("replies")
 }

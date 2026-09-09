@@ -198,3 +198,101 @@ export const completeArtworkDelivery = async (data: {
     return artwork;
   });
 };
+
+export const findLetterById = (letterId: number) => {
+  return prisma.letter.findUnique({
+    where: { id: letterId },
+    include: {
+      sender: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+      artist: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+      artwork: true,
+      replies: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+export const createReply = (data: {
+  letterId: number;
+  authorId: number;
+  message: string;
+}) => {
+  return prisma.reply.create({
+    data: {
+      letterId: data.letterId,
+      authorId: data.authorId,
+      message: data.message,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+    },
+  });
+};
+
+export const findSentLettersByUser = (senderId: number) => {
+  return prisma.letter.findMany({
+    where: { senderId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      artist: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+      artwork: true,
+      _count: {
+        select: { replies: true },
+      },
+    },
+  });
+};
+
+export const findClaimedLettersByArtist = (artistId: number) => {
+  return prisma.letter.findMany({
+    where: { artistId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      sender: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+      artwork: true,
+      _count: {
+        select: { replies: true },
+      },
+    },
+  });
+};

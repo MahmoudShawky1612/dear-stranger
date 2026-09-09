@@ -2,6 +2,8 @@ import {
   claimLetter as claimLetterRepository,
   createLetter as createLetterRepository,
   findAvailableLetters,
+  findSentLettersByUser,
+  findClaimedLettersByArtist,
 } from "./letter.repository.js";
 
 import type { CreateLetterInput } from "./letter.schema.js";
@@ -43,4 +45,12 @@ export const claimLetter = async (
 
 export const getAvailableLetters = async () => {
   return findAvailableLetters();
+};
+
+export const getMySentLetters = async (userId: number) => {
+  return findSentLettersByUser(userId);
+};
+
+export const getMyClaimedLetters = async (userId: number) => {
+  return findClaimedLettersByArtist(userId);
 };
