@@ -1,28 +1,26 @@
 import {
+  DeleteObjectCommand,
+  GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
-  DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "node:crypto";
-import { b2 } from "../../lib/b2.js";
+
+import { avatarBucketName, b2Avatars } from "../../lib/b2.js";
 import {
   findUserById,
+  findUserByUsername,
   updateUserAvatar,
 } from "./user.repository.js";
 import type {
-  CreateAvatarUploadInput,
   CompleteAvatarInput,
+  CreateAvatarUploadInput,
 } from "./avatar.schema.js";
 import { UserNotFoundError } from "./user.service.js";
 
-const avatarBucketName = process.env["B2_AVATAR_BUCKET_NAME"];
-
-if (!avatarBucketName) {
-  throw new Error("Missing B2_AVATAR_BUCKET_NAME environment variable");
-}
-
 const UPLOAD_URL_TTL_SECONDS = 10 * 60;
+const AVATAR_URL_TTL_SECONDS = 6 * 24 * 60 * 60;
 const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
 
 const extensionByContentType: Record<string, string> = {
@@ -31,12 +29,82 @@ const extensionByContentType: Record<string, string> = {
   "image/webp": "webp",
 };
 
+const allowedContentTypes = new Set(Object.keys(extensionByContentType));
+
 export class AvatarUploadValidationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "AvatarUploadValidationError";
   }
 }
+
+export class AvatarNotFoundError extends Error {
+  constructor() {
+    super("Avatar not found");
+    this.name = "AvatarNotFoundError";
+  }
+}
+
+export const extractAvatarStorageKey = (
+  stored: string | null | undefined,
+): string | null => {
+  if (!stored) {
+    return null;
+  }
+
+  if (stored.startsWith("avatars/")) {
+    return stored;
+  }
+
+  try {
+    const url = new URL(stored);
+    const key = url.pathname.replace(/^\/+/, "");
+    if (key.startsWith("avatars/")) {
+      return key;
+    }
+  } catch {
+    // not a URL
+  }
+
+  const fromHost = stored.split(".com/")[1];
+  if (fromHost?.startsWith("avatars/")) {
+    return fromHost;
+  }
+
+  return null;
+};
+
+export const getAvatarAccessUrl = async (
+  stored: string | null | undefined,
+): Promise<string | null> => {
+  const storageKey = extractAvatarStorageKey(stored);
+
+  if (!storageKey) {
+    return stored ?? null;
+  }
+
+  const command = new GetObjectCommand({
+    Bucket: avatarBucketName,
+    Key: storageKey,
+  });
+
+  return getSignedUrl(b2Avatars, command, {
+    expiresIn: AVATAR_URL_TTL_SECONDS,
+  });
+};
+
+const deleteAvatarObject = async (storageKey: string) => {
+  try {
+    await b2Avatars.send(
+      new DeleteObjectCommand({
+        Bucket: avatarBucketName,
+        Key: storageKey,
+      }),
+    );
+  } catch {
+    // ignore cleanup errors
+  }
+};
 
 export const createAvatarUploadUrl = async (
   userId: number,
@@ -60,7 +128,7 @@ export const createAvatarUploadUrl = async (
     ContentType: input.contentType,
   });
 
-  const uploadUrl = await getSignedUrl(b2, command, {
+  const uploadUrl = await getSignedUrl(b2Avatars, command, {
     expiresIn: UPLOAD_URL_TTL_SECONDS,
   });
 
@@ -85,10 +153,9 @@ export const completeAvatarUpload = async (
     throw new AvatarUploadValidationError("Avatar does not belong to this user");
   }
 
-  // Verify the real object in B2
   let metadata;
   try {
-    const result = await b2.send(
+    const result = await b2Avatars.send(
       new HeadObjectCommand({
         Bucket: avatarBucketName,
         Key: input.storageKey,
@@ -102,7 +169,10 @@ export const completeAvatarUpload = async (
     throw new AvatarUploadValidationError("Uploaded avatar was not found");
   }
 
-  if (!metadata.contentType || !["image/jpeg", "image/png", "image/webp"].includes(metadata.contentType)) {
+  if (
+    !metadata.contentType ||
+    !allowedContentTypes.has(metadata.contentType)
+  ) {
     throw new AvatarUploadValidationError("Invalid avatar content type");
   }
 
@@ -114,34 +184,18 @@ export const completeAvatarUpload = async (
     throw new AvatarUploadValidationError("Invalid avatar file size");
   }
 
-  // Optional: delete old avatar from B2 if it exists
-  if (user.avatarUrl) {
-    const oldKey = user.avatarUrl.split(".com/")[1]; // adjust if your public URL format is different
-    if (oldKey && oldKey.startsWith(`avatars/${userId}/`)) {
-      try {
-        await b2.send(
-          new DeleteObjectCommand({
-            Bucket: avatarBucketName,
-            Key: oldKey,
-          }),
-        );
-      } catch {
-        // ignore cleanup errors
-      }
-    }
+  const oldKey = extractAvatarStorageKey(user.avatarUrl);
+  if (oldKey && oldKey !== input.storageKey && oldKey.startsWith(expectedPrefix)) {
+    await deleteAvatarObject(oldKey);
   }
 
-  // Build the public URL (adjust to your B2 public URL style)
-  const publicBase = process.env["B2_PUBLIC_URL"]; // e.g. https://f000.backblazeb2.com/file/your-bucket
-  if (!publicBase) {
-    throw new Error("Missing B2_PUBLIC_URL environment variable");
-  }
+  const updatedUser = await updateUserAvatar(userId, input.storageKey);
+  const avatarUrl = await getAvatarAccessUrl(updatedUser.avatarUrl);
 
-  const avatarUrl = `${publicBase}/${input.storageKey}`;
-
-  const updatedUser = await updateUserAvatar(userId, avatarUrl);
-
-  return updatedUser;
+  return {
+    ...updatedUser,
+    avatarUrl,
+  };
 };
 
 export const removeAvatar = async (userId: number) => {
@@ -150,22 +204,34 @@ export const removeAvatar = async (userId: number) => {
     throw new UserNotFoundError();
   }
 
-  if (user.avatarUrl) {
-    // Best-effort delete from B2
-    const key = user.avatarUrl.replace(/^https?:\/\/[^/]+\//, "");
-    if (key.startsWith(`avatars/${userId}/`)) {
-      try {
-        await b2.send(
-          new DeleteObjectCommand({
-            Bucket: avatarBucketName,
-            Key: key,
-          }),
-        );
-      } catch {
-        // ignore
-      }
-    }
+  const key = extractAvatarStorageKey(user.avatarUrl);
+  if (key?.startsWith(`avatars/${userId}/`)) {
+    await deleteAvatarObject(key);
   }
 
-  return updateUserAvatar(userId, null);
+  const updatedUser = await updateUserAvatar(userId, null);
+
+  return {
+    ...updatedUser,
+    avatarUrl: null,
+  };
+};
+
+export const getPublicAvatarAccessUrl = async (username: string) => {
+  const user = await findUserByUsername(username);
+
+  if (!user) {
+    throw new UserNotFoundError();
+  }
+
+  const url = await getAvatarAccessUrl(user.avatarUrl);
+
+  if (!url) {
+    throw new AvatarNotFoundError();
+  }
+
+  return {
+    url,
+    expiresIn: AVATAR_URL_TTL_SECONDS,
+  };
 };
