@@ -34,25 +34,6 @@ export const claimLetter = (
   });
 };
 
-export const findAvailableLetters = () => {
-  return prisma.letter.findMany({
-    where: {
-      status: "AVAILABLE",
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      sender: {
-        select: {
-          id: true,
-          username: true,
-          displayName: true,
-        },
-      },
-    },
-  });
-};
 
 export const findClaimedLetterForArtist = (
   letterId: number,
@@ -257,10 +238,42 @@ export const createReply = (data: {
   });
 };
 
-export const findSentLettersByUser = (senderId: number) => {
+
+
+export const findAvailableLetters = (params: {
+  limit: number;
+  cursor?: number;
+}) => {
   return prisma.letter.findMany({
-    where: { senderId },
-    orderBy: { createdAt: "desc" },
+    where: {
+      status: "AVAILABLE",
+      ...(params.cursor ? { id: { lt: params.cursor } } : {}),
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: params.limit,
+    include: {
+      sender: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+    },
+  });
+};
+
+export const findSentLettersByUser = (
+  senderId: number,
+  params: { limit: number; cursor?: number },
+) => {
+  return prisma.letter.findMany({
+    where: {
+      senderId,
+      ...(params.cursor ? { id: { lt: params.cursor } } : {}),
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: params.limit,
     include: {
       artist: {
         select: {
@@ -277,10 +290,17 @@ export const findSentLettersByUser = (senderId: number) => {
   });
 };
 
-export const findClaimedLettersByArtist = (artistId: number) => {
+export const findClaimedLettersByArtist = (
+  artistId: number,
+  params: { limit: number; cursor?: number },
+) => {
   return prisma.letter.findMany({
-    where: { artistId },
-    orderBy: { createdAt: "desc" },
+    where: {
+      artistId,
+      ...(params.cursor ? { id: { lt: params.cursor } } : {}),
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: params.limit,
     include: {
       sender: {
         select: {

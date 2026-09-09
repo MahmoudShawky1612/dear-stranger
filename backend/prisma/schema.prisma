@@ -25,6 +25,8 @@ model User {
   sessions       Session[]
   artworkUploads ArtworkUpload[]
   replies        Reply[]
+  guestbookHosted  GuestbookEntry[]  @relation("guestbookHost")
+  guestbookAuthored GuestbookEntry[] @relation("guestbookAuthor")
 
   @@map("users")
 }
@@ -120,4 +122,18 @@ model Reply {
 
   @@index([letterId, createdAt])
   @@map("replies")
+}
+
+model GuestbookEntry {
+  id        Int      @id @default(autoincrement())
+  hostId    Int      @map("host_id")
+  authorId  Int      @map("author_id")
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  host   User @relation("guestbookHost", fields: [hostId], references: [id], onDelete: Cascade)
+  author User @relation("guestbookAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([hostId, createdAt])
+  @@map("guestbook_entries")
 }

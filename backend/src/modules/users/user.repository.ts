@@ -111,3 +111,68 @@ export const findPublicUserByUsername = (username: string) => {
     },
   });
 };
+
+export const createGuestbookEntry = (data: {
+  hostId: number;
+  authorId: number;
+  message: string;
+}) => {
+  return prisma.guestbookEntry.create({
+    data: {
+      hostId: data.hostId,
+      authorId: data.authorId,
+      message: data.message,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+    },
+  });
+};
+
+export const findGuestbookEntries = (
+  hostId: number,
+  params: { limit: number; cursor?: number },
+) => {
+  return prisma.guestbookEntry.findMany({
+    where: {
+      hostId,
+      ...(params.cursor ? { id: { lt: params.cursor } } : {}),
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: params.limit,
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+    },
+  });
+};
+
+export const findGuestbookEntryById = (id: number) => {
+  return prisma.guestbookEntry.findUnique({
+    where: { id },
+  });
+};
+
+export const deleteGuestbookEntry = (id: number) => {
+  return prisma.guestbookEntry.delete({
+    where: { id },
+  });
+};
+
+export const updateUserAvatar = (userId: number, avatarUrl: string | null) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { avatarUrl },
+  });
+};

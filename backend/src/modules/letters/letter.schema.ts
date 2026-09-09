@@ -16,4 +16,10 @@ export const createLetterSchema = z.object({
   isAnonymous: z.boolean().default(false),
 });
 
+export const paginationSchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  cursor: z.coerce.number().int().positive().optional(),
+});
+
+export type PaginationInput = z.infer<typeof paginationSchema>;
 export type CreateLetterInput = z.infer<typeof createLetterSchema>;

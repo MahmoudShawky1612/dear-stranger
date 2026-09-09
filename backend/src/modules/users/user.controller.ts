@@ -4,7 +4,146 @@ import {
   updateMyProfile,
   getPublicProfileByUsername,
   UserNotFoundError,
+  createGuestbookEntry,
+  getGuestbookEntries,
+  deleteGuestbookEntry,
+  GuestbookEntryNotFoundError,
+  NotAllowedError,
 } from "./user.service.js";
+import { createGuestbookEntrySchema } from "./guestbook.schema.js";
+import { paginationSchema } from "../letters/letter.schema.js";
+
+
+import {
+  createAvatarUploadSchema,
+  completeAvatarSchema,
+} from "./avatar.schema.js";
+import {
+  createAvatarUploadUrl,
+  completeAvatarUpload,
+  removeAvatar,
+  AvatarUploadValidationError,
+} from "./avatar.service.js";
+
+export const createAvatarUploadUrlController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const userId = request.auth?.userId;
+  if (!userId) {
+    response.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+  const result = createAvatarUploadSchema.safeParse(request.body);
+  if (!result.success) {
+    response.status(400).json({
+      error: "Invalid request body",
+      details: result.error.issues,
+    });
+    return;
+  }
+
+  try {
+    const upload = await createAvatarUploadUrl(userId, result.data);
+    response.status(200).json(upload);
+  } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      response.status(404).json({ error: error.message });
+      return;
+    }
+    if (error instanceof AvatarUploadValidationError) {
+      response.status(400).json({ error: error.message });
+      return;
+    }
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+export const completeAvatarUploadController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const userId = request.auth?.userId;
+  if (!userId) {
+    response.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+  const result = completeAvatarSchema.safeParse(request.body);
+  if (!result.success) {
+    response.status(400).json({
+      error: "Invalid request body",
+      details: result.error.issues,
+    });
+    return;
+  }
+
+  try {
+    const user = await completeAvatarUpload(userId, result.data);
+    response.status(200).json({
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        avatarUrl: user.avatarUrl,
+        bio: user.bio,
+        location: user.location,
+        favoriteMedium: user.favoriteMedium,
+        currentlyDrawing: user.currentlyDrawing,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      response.status(404).json({ error: error.message });
+      return;
+    }
+    if (error instanceof AvatarUploadValidationError) {
+      response.status(400).json({ error: error.message });
+      return;
+    }
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+export const removeAvatarController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const userId = request.auth?.userId;
+  if (!userId) {
+    response.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+  try {
+    const user = await removeAvatar(userId);
+    response.status(200).json({
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        avatarUrl: user.avatarUrl,
+        bio: user.bio,
+        location: user.location,
+        favoriteMedium: user.favoriteMedium,
+        currentlyDrawing: user.currentlyDrawing,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      response.status(404).json({ error: error.message });
+      return;
+    }
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
 
 export const updateMyProfileController = async (
   request: Request,
@@ -85,6 +224,153 @@ export const getPublicProfileController = async (
   } catch (error) {
     if (error instanceof UserNotFoundError) {
       response.status(404).json({ error: error.message });
+      return;
+    }
+
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+export const createGuestbookEntryController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const userId = request.auth?.userId;
+
+  if (!userId) {
+    response.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+const usernameParam = request.params["username"];
+const username = typeof usernameParam === "string" ? usernameParam : null;
+
+if (!username) {
+  response.status(400).json({ error: "Invalid username" });
+  return;
+}
+
+  const result = createGuestbookEntrySchema.safeParse(request.body);
+
+  if (!result.success) {
+    response.status(400).json({
+      error: "Invalid request body",
+      details: result.error.issues,
+    });
+    return;
+  }
+
+  try {
+    const entry = await createGuestbookEntry(username, userId, result.data);
+
+    response.status(201).json({
+      entry: {
+        id: entry.id,
+        message: entry.message,
+        createdAt: entry.createdAt,
+        author: {
+          id: entry.author.id,
+          username: entry.author.username,
+          displayName: entry.author.displayName,
+        },
+      },
+    });
+  } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      response.status(404).json({ error: error.message });
+      return;
+    }
+    if (error instanceof NotAllowedError) {
+      response.status(403).json({ error: error.message });
+      return;
+    }
+
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+export const getGuestbookEntriesController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const usernameParam = request.params["username"];
+const username = typeof usernameParam === "string" ? usernameParam : null;
+
+if (!username) {
+  response.status(400).json({ error: "Invalid username" });
+  return;
+}
+
+  const paginationResult = paginationSchema.safeParse(request.query);
+
+  if (!paginationResult.success) {
+    response.status(400).json({
+      error: "Invalid pagination parameters",
+      details: paginationResult.error.issues,
+    });
+    return;
+  }
+
+  try {
+    const { entries, nextCursor } = await getGuestbookEntries(
+      username,
+      paginationResult.data,
+    );
+
+    response.status(200).json({
+      entries: entries.map((entry) => ({
+        id: entry.id,
+        message: entry.message,
+        createdAt: entry.createdAt,
+        author: {
+          id: entry.author.id,
+          username: entry.author.username,
+          displayName: entry.author.displayName,
+        },
+      })),
+      nextCursor,
+    });
+  } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      response.status(404).json({ error: error.message });
+      return;
+    }
+
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+export const deleteGuestbookEntryController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const userId = request.auth?.userId;
+
+  if (!userId) {
+    response.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+  const entryId = Number(request.params["id"]);
+
+  if (!Number.isInteger(entryId) || entryId <= 0) {
+    response.status(400).json({ error: "Invalid entry ID" });
+    return;
+  }
+
+  try {
+    await deleteGuestbookEntry(entryId, userId);
+    response.status(204).send();
+  } catch (error) {
+    if (error instanceof GuestbookEntryNotFoundError) {
+      response.status(404).json({ error: error.message });
+      return;
+    }
+    if (error instanceof NotAllowedError) {
+      response.status(403).json({ error: error.message });
       return;
     }
 

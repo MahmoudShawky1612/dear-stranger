@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import { createLetterSchema } from "./letter.schema.js";
 import {
   claimLetter,
   createLetter,
@@ -27,6 +26,7 @@ import {
 createArtworkUploadUrl,
 } from "./artwork.service.js";
 
+import { createLetterSchema, paginationSchema } from "./letter.schema.js";
 export const createLetterController = async (
   request: Request,
   response: Response,
@@ -125,11 +125,23 @@ export const claimLetterController = async (
 };
 
 export const getAvailableLettersController = async (
-  _request: Request,
+  request: Request,
   response: Response,
 ): Promise<void> => {
+  const paginationResult = paginationSchema.safeParse(request.query);
+
+  if (!paginationResult.success) {
+    response.status(400).json({
+      error: "Invalid pagination parameters",
+      details: paginationResult.error.issues,
+    });
+    return;
+  }
+
   try {
-    const letters = await getAvailableLetters();
+    const { letters, nextCursor } = await getAvailableLetters(
+      paginationResult.data,
+    );
 
     response.status(200).json({
       letters: letters.map((letter) => ({
@@ -147,13 +159,11 @@ export const getAvailableLettersController = async (
               displayName: letter.sender.displayName,
             },
       })),
+      nextCursor,
     });
   } catch (error) {
     console.error(error);
-
-    response.status(500).json({
-      error: "Something went wrong",
-    });
+    response.status(500).json({ error: "Something went wrong" });
   }
 };
 
@@ -442,8 +452,21 @@ export const getMySentLettersController = async (
     return;
   }
 
+  const paginationResult = paginationSchema.safeParse(request.query);
+
+  if (!paginationResult.success) {
+    response.status(400).json({
+      error: "Invalid pagination parameters",
+      details: paginationResult.error.issues,
+    });
+    return;
+  }
+
   try {
-    const letters = await getMySentLetters(userId);
+    const { letters, nextCursor } = await getMySentLetters(
+      userId,
+      paginationResult.data,
+    );
 
     response.status(200).json({
       letters: letters.map((letter) => ({
@@ -474,6 +497,7 @@ export const getMySentLettersController = async (
           : null,
         replyCount: letter._count.replies,
       })),
+      nextCursor,
     });
   } catch (error) {
     console.error(error);
@@ -492,8 +516,21 @@ export const getMyClaimedLettersController = async (
     return;
   }
 
+  const paginationResult = paginationSchema.safeParse(request.query);
+
+  if (!paginationResult.success) {
+    response.status(400).json({
+      error: "Invalid pagination parameters",
+      details: paginationResult.error.issues,
+    });
+    return;
+  }
+
   try {
-    const letters = await getMyClaimedLetters(userId);
+    const { letters, nextCursor } = await getMyClaimedLetters(
+      userId,
+      paginationResult.data,
+    );
 
     response.status(200).json({
       letters: letters.map((letter) => ({
@@ -524,6 +561,7 @@ export const getMyClaimedLettersController = async (
           : null,
         replyCount: letter._count.replies,
       })),
+      nextCursor,
     });
   } catch (error) {
     console.error(error);
