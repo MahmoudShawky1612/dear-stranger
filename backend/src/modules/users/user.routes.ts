@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express, { Router } from "express";
 import { requireAuthentication } from "../../middleware/auth.middleware.js";
 import {
   updateMyProfileController,
@@ -8,6 +8,7 @@ import {
   deleteGuestbookEntryController,
   completeAvatarUploadController,
   createAvatarUploadUrlController,
+  uploadAvatarDirectController,
   removeAvatarController,
 } from "./user.controller.js";
 
@@ -19,6 +20,13 @@ router.post(
   "/me/avatar/upload-url",
   requireAuthentication,
   createAvatarUploadUrlController,
+);
+
+router.post(
+  "/me/avatar/file",
+  requireAuthentication,
+  express.raw({ type: () => true, limit: "2mb" }),
+  uploadAvatarDirectController,
 );
 
 router.post(

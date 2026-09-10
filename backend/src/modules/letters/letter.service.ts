@@ -4,7 +4,9 @@ import {
   findAvailableLetters,
   findSentLettersByUser,
   findClaimedLettersByArtist,
+  findLetterById,
 } from "./letter.repository.js";
+import { createAndDispatchNotification } from "../notifications/notification.service.js";
 
 import type { CreateLetterInput, PaginationInput } from "./letter.schema.js";
 
@@ -12,6 +14,13 @@ export class LetterNotAvailableError extends Error {
   constructor() {
     super("Letter is no longer available");
     this.name = "LetterNotAvailableError";
+  }
+}
+
+export class CannotClaimOwnLetterError extends Error {
+  constructor() {
+    super("You cannot claim your own letter");
+    this.name = "CannotClaimOwnLetterError";
   }
 }
 
@@ -23,6 +32,20 @@ export const createLetter = async (
 };
 
 export const claimLetter = async (letterId: number, artistId: number) => {
+  const existing = await findLetterById(letterId);
+
+  if (!existing) {
+    throw new LetterNotAvailableError();
+  }
+
+  if (Number(existing.senderId) === Number(artistId)) {
+    throw new CannotClaimOwnLetterError();
+  }
+
+  if (existing.status !== "AVAILABLE" || existing.artistId !== null) {
+    throw new LetterNotAvailableError();
+  }
+
   const claimedAt = new Date();
 
   const result = await claimLetterRepository(letterId, artistId, claimedAt);
@@ -33,10 +56,20 @@ export const claimLetter = async (letterId: number, artistId: number) => {
     throw new LetterNotAvailableError();
   }
 
+  createAndDispatchNotification({
+    userId: Number(existing.senderId),
+    letterId,
+    type: "LETTER_CLAIMED",
+    title: "💌 Letter Claimed!",
+    message: `An artist has claimed your letter "${existing.title}"!`,
+  }).catch(console.error);
+
   return letter;
 };
 
-export const getAvailableLetters = async (pagination: PaginationInput) => {
+export const getAvailableLetters = async (
+  pagination: PaginationInput,
+) => {
   const params: { limit: number; cursor?: number } = {
     limit: pagination.limit,
   };

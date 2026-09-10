@@ -27,7 +27,7 @@ export const requireAuthentication = async (
     }
 
     request.auth = {
-      userId: session.user.id,
+      userId: Number(session.user.id),
       sessionId: session.id,
     };
 
@@ -35,4 +35,32 @@ export const requireAuthentication = async (
   } catch (error) {
     next(error);
   }
+};
+
+export const optionalAuthentication = async (
+  request: Request,
+  response: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const token = request.cookies?.[SESSION_COOKIE_NAME];
+
+  if (!token) {
+    next();
+    return;
+  }
+
+  try {
+    const session = await getSession(token);
+
+    if (session) {
+      request.auth = {
+        userId: Number(session.user.id),
+        sessionId: session.id,
+      };
+    }
+  } catch {
+    // Invalid session should not block public routes
+  }
+
+  next();
 };

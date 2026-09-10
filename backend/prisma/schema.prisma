@@ -27,6 +27,7 @@ model User {
   replies        Reply[]
   guestbookHosted  GuestbookEntry[]  @relation("guestbookHost")
   guestbookAuthored GuestbookEntry[] @relation("guestbookAuthor")
+  notifications    Notification[]
 
   @@map("users")
 }
@@ -54,6 +55,7 @@ model Letter {
   artwork  Artwork?
   artworkUploads ArtworkUpload[]
   replies        Reply[]
+  notifications  Notification[]
 
   @@index([status, createdAt])
   @@index([senderId, createdAt])
@@ -136,4 +138,22 @@ model GuestbookEntry {
 
   @@index([hostId, createdAt])
   @@map("guestbook_entries")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  letterId  Int      @map("letter_id")
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  letter Letter @relation(fields: [letterId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

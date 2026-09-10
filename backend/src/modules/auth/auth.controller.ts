@@ -9,6 +9,7 @@ import {
 import { SESSION_COOKIE_NAME, sessionCookieOptions } from "./auth.cookie.js";
 import { getUserById } from "../users/user.service.js";
 import { deleteUserSession } from "./auth.session.service.js";
+import { getAvatarAccessUrl } from "../users/avatar.service.js";
 
 export const registerController = async (
   request: Request,
@@ -28,13 +29,11 @@ export const registerController = async (
     const { user, session } = await registerUser(result.data);
 
     response.cookie(SESSION_COOKIE_NAME, session.token, {
-      httpOnly: true,
-      secure: process.env["NODE_ENV"] === "production",
-      sameSite: "strict",
-      path: "/",
+      ...sessionCookieOptions,
       expires: session.expiresAt,
     });
 
+    // New users have no avatar, so avatarUrl is null — no signing needed
     response.status(201).json({
       user: {
         id: user.id,
@@ -87,6 +86,8 @@ export const getCurrentUserController = async (
     return;
   }
 
+  const avatarUrl = await getAvatarAccessUrl(user.avatarUrl);
+
   response.status(200).json({
     user: {
       id: user.id,
@@ -94,7 +95,7 @@ export const getCurrentUserController = async (
       email: user.email,
       displayName: user.displayName,
       bio: user.bio,
-      avatarUrl: user.avatarUrl,
+      avatarUrl,
       location: user.location,
       favoriteMedium: user.favoriteMedium,
       currentlyDrawing: user.currentlyDrawing,
@@ -125,6 +126,8 @@ export const loginController = async (
       expires: session.expiresAt,
     });
 
+    const avatarUrl = await getAvatarAccessUrl(user.avatarUrl);
+
     response.status(200).json({
       user: {
         id: user.id,
@@ -132,7 +135,7 @@ export const loginController = async (
         email: user.email,
         displayName: user.displayName,
         bio: user.bio,
-        avatarUrl: user.avatarUrl,
+        avatarUrl,
         location: user.location,
         favoriteMedium: user.favoriteMedium,
         currentlyDrawing: user.currentlyDrawing,

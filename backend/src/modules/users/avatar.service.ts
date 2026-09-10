@@ -120,6 +120,9 @@ export const createAvatarUploadUrl = async (
   }
 
   const extension = extensionByContentType[input.contentType];
+  if (!extension) {
+    throw new AvatarUploadValidationError("Only JPEG, PNG, and WebP images are supported");
+  }
   const storageKey = `avatars/${userId}/${randomUUID()}.${extension}`;
 
   const command = new PutObjectCommand({
@@ -137,6 +140,31 @@ export const createAvatarUploadUrl = async (
     storageKey,
     expiresIn: UPLOAD_URL_TTL_SECONDS,
   };
+};
+
+export const uploadAvatarDirect = async (
+  userId: number,
+  input: {
+    contentType: CreateAvatarUploadInput["contentType"];
+    body: Buffer;
+  },
+) => {
+  const { storageKey } = await createAvatarUploadUrl(userId, {
+    contentType: input.contentType,
+    fileSizeBytes: input.body.length,
+  });
+
+  await b2Avatars.send(
+    new PutObjectCommand({
+      Bucket: avatarBucketName,
+      Key: storageKey,
+      ContentType: input.contentType,
+      Body: input.body,
+      ContentLength: input.body.length,
+    }),
+  );
+
+  return completeAvatarUpload(userId, { storageKey });
 };
 
 export const completeAvatarUpload = async (

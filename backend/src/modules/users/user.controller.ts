@@ -21,7 +21,9 @@ import {
 import {
   createAvatarUploadUrl,
   completeAvatarUpload,
+  uploadAvatarDirect,
   removeAvatar,
+  getAvatarAccessUrl,
   AvatarUploadValidationError,
 } from "./avatar.service.js";
 
@@ -61,6 +63,70 @@ export const createAvatarUploadUrlController = async (
   }
 };
 
+const parseImageContentType = (
+  header: string | undefined,
+): "image/jpeg" | "image/png" | "image/webp" | null => {
+  const raw = (header ?? "").split(";")[0]?.trim().toLowerCase();
+  if (raw === "image/jpg") return "image/jpeg";
+  if (raw === "image/jpeg" || raw === "image/png" || raw === "image/webp") {
+    return raw;
+  }
+  return null;
+};
+
+export const uploadAvatarDirectController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const userId = request.auth?.userId;
+  if (!userId) {
+    response.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+  const contentType = parseImageContentType(request.headers["content-type"]);
+  if (!contentType) {
+    response.status(400).json({
+      error: "Only JPEG, PNG, and WebP images are supported",
+    });
+    return;
+  }
+
+  const body = request.body;
+  if (!Buffer.isBuffer(body) || body.length === 0) {
+    response.status(400).json({ error: "Avatar file is required" });
+    return;
+  }
+
+  try {
+    const user = await uploadAvatarDirect(userId, { contentType, body });
+    response.status(200).json({
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName ?? "",
+        avatarUrl: user.avatarUrl,
+        bio: user.bio,
+        location: user.location,
+        favoriteMedium: user.favoriteMedium,
+        currentlyDrawing: user.currentlyDrawing,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      response.status(404).json({ error: error.message });
+      return;
+    }
+    if (error instanceof AvatarUploadValidationError) {
+      response.status(400).json({ error: error.message });
+      return;
+    }
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
 export const completeAvatarUploadController = async (
   request: Request,
   response: Response,
@@ -86,7 +152,7 @@ export const completeAvatarUploadController = async (
       user: {
         id: user.id,
         username: user.username,
-        displayName: user.displayName,
+        displayName: user.displayName ?? "",
         avatarUrl: user.avatarUrl,
         bio: user.bio,
         location: user.location,
@@ -168,6 +234,7 @@ export const updateMyProfileController = async (
 
   try {
     const user = await updateMyProfile(userId, result.data);
+    const avatarUrl = await getAvatarAccessUrl(user.avatarUrl);
 
     response.status(200).json({
       user: {
@@ -176,7 +243,7 @@ export const updateMyProfileController = async (
         email: user.email,
         displayName: user.displayName,
         bio: user.bio,
-        avatarUrl: user.avatarUrl,
+        avatarUrl,
         location: user.location,
         favoriteMedium: user.favoriteMedium,
         currentlyDrawing: user.currentlyDrawing,
@@ -207,6 +274,7 @@ export const getPublicProfileController = async (
 
   try {
     const user = await getPublicProfileByUsername(username);
+    const avatarUrl = await getAvatarAccessUrl(user.avatarUrl);
 
     response.status(200).json({
       user: {
@@ -214,7 +282,7 @@ export const getPublicProfileController = async (
         username: user.username,
         displayName: user.displayName,
         bio: user.bio,
-        avatarUrl: user.avatarUrl,
+        avatarUrl,
         location: user.location,
         favoriteMedium: user.favoriteMedium,
         currentlyDrawing: user.currentlyDrawing,

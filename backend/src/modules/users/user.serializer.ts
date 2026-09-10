@@ -25,7 +25,7 @@ export const serializeUser = async (
     ...(options?.includeEmail === true && user.email !== undefined
       ? { email: user.email }
       : {}),
-    displayName: user.displayName,
+    displayName: user.displayName ?? "",
     bio: user.bio,
     avatarUrl,
     location: user.location,

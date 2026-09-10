@@ -53,3 +53,39 @@ if (!artworkBucketName) {
 if (!avatarBucketName) {
   throw new Error("Missing B2_AVATAR_BUCKET_NAME environment variable");
 }
+
+export const ensureBucketCors = async () => {
+  const { PutBucketCorsCommand } = await import("@aws-sdk/client-s3");
+  const corsRules = [
+    {
+      AllowedHeaders: ["*"],
+      AllowedMethods: ["GET", "HEAD", "PUT", "POST", "DELETE"],
+      AllowedOrigins: ["*"],
+      ExposeHeaders: ["ETag", "Content-Type", "Content-Length"],
+      MaxAgeSeconds: 3600,
+    },
+  ];
+
+  try {
+    await b2.send(
+      new PutBucketCorsCommand({
+        Bucket: artworkBucketName,
+        CORSConfiguration: { CORSRules: corsRules },
+      }),
+    );
+  } catch (err) {
+    console.warn("Could not set CORS for artwork bucket:", err);
+  }
+
+  try {
+    await b2Avatars.send(
+      new PutBucketCorsCommand({
+        Bucket: avatarBucketName,
+        CORSConfiguration: { CORSRules: corsRules },
+      }),
+    );
+  } catch (err) {
+    console.warn("Could not set CORS for avatar bucket:", err);
+  }
+};
+

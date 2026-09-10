@@ -16,9 +16,12 @@ import {
 import {
   completeArtworkDelivery as completeArtworkDeliveryRepository,
   createArtworkUpload,
+  deleteArtworkUpload,
   findArtworkUpload,
   findClaimedLetterForArtist,
+  findLetterById,
 } from "./letter.repository.js";
+import { createAndDispatchNotification } from "../notifications/notification.service.js";
 
 export class ArtworkAlreadyDeliveredError extends Error {
   constructor() {
@@ -88,6 +91,11 @@ export const createArtworkUploadUrl = async (
   }
 
   const extension = extensionByContentType[input.contentType];
+  if (!extension) {
+    throw new ArtworkUploadValidationError(
+      "Only JPEG, PNG, and WebP images are supported",
+    );
+  }
 
   const storageKey = `artworks/${letterId}/${randomUUID()}.${extension}`;
 
@@ -119,6 +127,36 @@ export const createArtworkUploadUrl = async (
     storageKey,
     expiresIn: UPLOAD_URL_TTL_SECONDS,
   };
+};
+
+export const uploadArtworkDirect = async (
+  letterId: number,
+  artistId: number,
+  input: {
+    contentType: CreateArtworkUploadInput["contentType"];
+    body: Buffer;
+    isAnonymous: boolean;
+  },
+) => {
+  const { storageKey } = await createArtworkUploadUrl(letterId, artistId, {
+    contentType: input.contentType,
+    fileSizeBytes: input.body.length,
+  });
+
+  await b2.send(
+    new PutObjectCommand({
+      Bucket: bucketName,
+      Key: storageKey,
+      ContentType: input.contentType,
+      Body: input.body,
+      ContentLength: input.body.length,
+    }),
+  );
+
+  return completeArtworkDelivery(letterId, artistId, {
+    storageKey,
+    isAnonymous: input.isAnonymous,
+  });
 };
 
 export const getUploadedArtworkMetadata = async (
@@ -296,6 +334,18 @@ export const completeArtworkDelivery = async (
   if (!artwork) {
     throw new LetterNotClaimedByArtistError();
   }
+
+  findLetterById(letterId).then((letter) => {
+    if (letter) {
+      createAndDispatchNotification({
+        userId: Number(letter.senderId),
+        letterId,
+        type: "ARTWORK_DELIVERED",
+        title: "🎨 Artwork Delivered!",
+        message: `An artist has illustrated your letter "${letter.title}"!`,
+      }).catch(console.error);
+    }
+  }).catch(console.error);
 
   return artwork;
 };

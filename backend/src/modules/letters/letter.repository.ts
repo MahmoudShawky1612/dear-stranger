@@ -25,6 +25,9 @@ export const claimLetter = (
       id: letterId,
       status: "AVAILABLE",
       artistId: null,
+      senderId: {
+        not: artistId,
+      },
     },
     data: {
       artistId,

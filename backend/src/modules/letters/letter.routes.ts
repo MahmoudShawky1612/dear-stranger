@@ -1,9 +1,13 @@
-import { Router } from "express";
-import { requireAuthentication } from "../../middleware/auth.middleware.js";
+import express, { Router } from "express";
+import {
+  optionalAuthentication,
+  requireAuthentication,
+} from "../../middleware/auth.middleware.js";
 import {
   claimLetterController,
   completeArtworkDeliveryController,
   createArtworkUploadUrlController,
+  uploadArtworkDirectController,
   createLetterController,
   createReplyController,
   getAvailableLettersController,
@@ -16,7 +20,7 @@ import {
 
 const router = Router();
 
-router.get("/", getAvailableLettersController);
+router.get("/", optionalAuthentication, getAvailableLettersController);
 
 router.get(
   "/mine/sent",
@@ -32,6 +36,13 @@ router.get(
 
 router.post("/", requireAuthentication, createLetterController);
 
+// NOTE: /artwork/:artworkId/url must be before /:id to avoid the wildcard swallowing it
+router.get(
+  "/artwork/:artworkId/url",
+  requireAuthentication,
+  getArtworkAccessUrlController,
+);
+
 router.get("/:id", requireAuthentication, getLetterController);
 
 router.post("/:id/claim", requireAuthentication, claimLetterController);
@@ -40,6 +51,13 @@ router.post(
   "/:id/artwork/upload-url",
   requireAuthentication,
   createArtworkUploadUrlController,
+);
+
+router.post(
+  "/:id/artwork/file",
+  requireAuthentication,
+  express.raw({ type: () => true, limit: "10mb" }),
+  uploadArtworkDirectController,
 );
 
 router.post(
@@ -54,15 +72,10 @@ router.post(
   createReplyController,
 );
 
-router.get(
-  "/artwork/:artworkId/url",
-  requireAuthentication,
-  getArtworkAccessUrlController,
-);
-export default router;
-
 router.post(
   "/:id/artwork/publish",
   requireAuthentication,
   publishArtworkController,
 );
+
+export default router;
