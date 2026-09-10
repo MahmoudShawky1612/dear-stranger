@@ -68,7 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
       });
       if (!mounted) return;
       context.read<AuthProvider>().updateUser(updated);
-      setState(() { _saving = false; _success = 'Profile saved!'; });
+      setState(() { _saving = false; _success = 'Profile updated!'; });
     } catch (e) {
       setState(() { _saving = false; _error = e.toString(); });
     }
@@ -96,7 +96,7 @@ class _SettingsPageState extends State<SettingsPage> {
       final updated = await _api.uploadAvatarFile(bytes: file.bytes!, contentType: contentType);
       if (!mounted) return;
       context.read<AuthProvider>().updateUser(updated);
-      setState(() { _avatarLoading = false; _success = 'Avatar updated!'; });
+      setState(() { _avatarLoading = false; _success = 'Profile picture updated!'; });
     } catch (e) {
       if (mounted) setState(() { _avatarLoading = false; _error = e.toString(); });
     }
@@ -110,22 +110,20 @@ class _SettingsPageState extends State<SettingsPage> {
       final auth = context.read<AuthProvider>();
       if (auth.user != null) {
         final u = auth.user!;
-        auth.updateUser(
-          User(
-            id: u.id,
-            username: u.username,
-            email: u.email,
-            displayName: u.displayName,
-            bio: u.bio,
-            avatarUrl: null,
-            location: u.location,
-            favoriteMedium: u.favoriteMedium,
-            currentlyDrawing: u.currentlyDrawing,
-            createdAt: u.createdAt,
-          ),
-        );
+        auth.updateUser(User(
+          id: u.id,
+          username: u.username,
+          email: u.email,
+          displayName: u.displayName,
+          bio: u.bio,
+          avatarUrl: null,
+          location: u.location,
+          favoriteMedium: u.favoriteMedium,
+          currentlyDrawing: u.currentlyDrawing,
+          createdAt: u.createdAt,
+        ));
       }
-      setState(() { _avatarLoading = false; _success = 'Avatar removed.'; });
+      setState(() { _avatarLoading = false; _success = 'Profile picture removed.'; });
     } catch (e) {
       setState(() { _avatarLoading = false; _error = e.toString(); });
     }
@@ -140,119 +138,156 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Page title
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('⚙ SETTINGS', style: RetroTextStyles.h2),
-                if (user != null)
+                Expanded(
+                  child: Container(
+                    color: RetroColors.sectionHeaderPurple,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    child: Text('■ MY SPACE — EDIT PROFILE', style: RetroTextStyles.sectionTitle),
+                  ),
+                ),
+                if (user != null) ...[
+                  const SizedBox(width: 8),
                   RetroButton(
-                    label: 'VIEW MY PROFILE',
+                    label: '» VIEW MY PROFILE',
                     onPressed: () => context.go('/profile/${user.username}'),
                     isSmall: true,
                   ),
+                ],
               ],
             ),
-            const RetroDivider(),
+            const SizedBox(height: 14),
 
-            // Avatar section
+            // Success / Error banners
+            if (_success != null)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFFDDFFDD),
+                padding: const EdgeInsets.all(8),
+                margin: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  '✓ $_success',
+                  style: RetroTextStyles.small.copyWith(color: RetroColors.accentGreen),
+                ),
+              ),
+            if (_error != null)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFFFFEEEE),
+                padding: const EdgeInsets.all(8),
+                margin: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  '⚠ $_error',
+                  style: RetroTextStyles.small.copyWith(color: RetroColors.accent),
+                ),
+              ),
+
+            // Profile picture section
             RetroCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              title: 'PROFILE PICTURE',
+              titleBarColor: RetroColors.sectionHeader,
+              child: Row(
                 children: [
-                  Text('AVATAR', style: RetroTextStyles.h3),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: RetroColors.border, width: 2),
-                          color: RetroColors.background,
-                        ),
-                        child: user?.avatarUrl != null
-                            ? Image.network(user!.avatarUrl!, fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Center(child: Text('?')))
-                            : const Center(child: Text('?', style: TextStyle(fontSize: 28, color: RetroColors.border))),
+                  // Avatar with dotted border (MySpace style)
+                  Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: RetroColors.sectionHeader,
+                        width: 2,
+                        style: BorderStyle.solid,
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      color: RetroColors.pageBackground,
+                    ),
+                    child: user?.avatarUrl != null
+                        ? Image.network(
+                            user!.avatarUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const _AvatarPlaceholder(),
+                          )
+                        : const _AvatarPlaceholder(),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'JPG, PNG, or WebP · Max 2 MB',
+                          style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary),
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
-                            Text('JPG, PNG, or WebP · Max 2 MB', style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary)),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                _avatarLoading
-                                    ? const RetroLoading()
-                                    : RetroButton(label: 'UPLOAD', onPressed: _uploadAvatar, isSmall: true),
-                                if (user?.avatarUrl != null)
-                                  RetroButton(label: 'REMOVE', onPressed: _removeAvatar, isSmall: true),
-                              ],
-                            ),
+                            _avatarLoading
+                                ? const RetroLoading()
+                                : RetroButton(
+                                    label: '📎 UPLOAD PHOTO',
+                                    onPressed: _uploadAvatar,
+                                    isSmall: true,
+                                  ),
+                            if (user?.avatarUrl != null)
+                              RetroButton(
+                                label: 'REMOVE',
+                                onPressed: _removeAvatar,
+                                isSmall: true,
+                                isDanger: true,
+                              ),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
-            // Profile fields
+            // Profile info
             RetroCard(
+              title: 'ABOUT ME',
+              titleBarColor: RetroColors.sectionHeader,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('PROFILE INFO', style: RetroTextStyles.h3),
+                  RetroTextField(controller: _displayNameCtrl, label: 'DISPLAY NAME:', hint: 'Your name or alias'),
+                  const SizedBox(height: 12),
+                  RetroTextField(controller: _bioCtrl, label: 'BIO:', hint: 'Tell everyone about yourself', maxLines: 4),
+                  const SizedBox(height: 12),
+                  RetroTextField(controller: _locationCtrl, label: 'LOCATION:', hint: 'e.g. Cairo, Egypt'),
+                  const SizedBox(height: 12),
+                  RetroTextField(controller: _mediumCtrl, label: 'FAVORITE MEDIUM:', hint: 'e.g. Watercolor, Digital'),
+                  const SizedBox(height: 12),
+                  RetroTextField(controller: _drawingCtrl, label: 'CURRENTLY DRAWING:', hint: 'What are you working on?'),
                   const SizedBox(height: 16),
-                  if (_error != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text('⚠ $_error', style: RetroTextStyles.small.copyWith(color: RetroColors.accent)),
-                    ),
-                  if (_success != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text('✓ $_success', style: RetroTextStyles.small.copyWith(color: Colors.green.shade700)),
-                    ),
-                  RetroTextField(controller: _displayNameCtrl, label: 'DISPLAY NAME', hint: 'Your name or alias'),
-                  const SizedBox(height: 14),
-                  RetroTextField(controller: _bioCtrl, label: 'BIO', hint: 'Tell us about yourself', maxLines: 4),
-                  const SizedBox(height: 14),
-                  RetroTextField(controller: _locationCtrl, label: 'LOCATION', hint: 'e.g. Cairo, Egypt'),
-                  const SizedBox(height: 14),
-                  RetroTextField(controller: _mediumCtrl, label: 'FAVORITE MEDIUM', hint: 'e.g. Watercolor, Digital'),
-                  const SizedBox(height: 14),
-                  RetroTextField(controller: _drawingCtrl, label: 'CURRENTLY DRAWING', hint: 'What are you working on?'),
-                  const SizedBox(height: 20),
                   _saving
-                      ? const RetroLoading(message: 'SAVING...')
-                      : RetroButton(label: 'SAVE CHANGES', onPressed: _save, isPrimary: true),
+                      ? const RetroLoading(message: 'SAVING YOUR PROFILE')
+                      : RetroButton(
+                          label: '✓ UPDATE MY PROFILE',
+                          onPressed: _save,
+                          isPrimary: true,
+                        ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
-            // Danger zone
+            // Account
             RetroCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('ACCOUNT', style: RetroTextStyles.h3),
-                  const SizedBox(height: 12),
-                  RetroButton(
-                    label: 'SIGN OUT',
-                    onPressed: () async {
-                      await context.read<AuthProvider>().logout();
-                      if (context.mounted) context.go('/');
-                    },
-                  ),
-                ],
+              title: 'ACCOUNT',
+              titleBarColor: RetroColors.sectionHeaderRed,
+              child: RetroButton(
+                label: 'SIGN OUT',
+                onPressed: () async {
+                  await context.read<AuthProvider>().logout();
+                  if (context.mounted) context.go('/');
+                },
+                isDanger: true,
               ),
             ),
           ],
@@ -260,4 +295,16 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+}
+
+class _AvatarPlaceholder extends StatelessWidget {
+  const _AvatarPlaceholder();
+
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Text(
+          '?',
+          style: RetroTextStyles.vt323.copyWith(fontSize: 40, color: RetroColors.border),
+        ),
+      );
 }

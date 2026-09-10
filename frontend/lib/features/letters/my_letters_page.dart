@@ -45,27 +45,46 @@ class _MyLettersPageState extends State<MyLettersPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('✉ MY SENT LETTERS', style: RetroTextStyles.h2),
-              RetroButton(label: '+ WRITE NEW', onPressed: () => context.go('/letters/new'), isSmall: true),
+              Expanded(
+                child: Container(
+                  color: RetroColors.sectionHeader,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Text('■ 📬 MY SENT MAIL', style: RetroTextStyles.sectionTitle),
+                ),
+              ),
+              const SizedBox(width: 8),
+              RetroButton(
+                label: '+ DROP A LETTER',
+                onPressed: () => context.go('/letters/new'),
+                isPrimary: true,
+                isSmall: true,
+              ),
             ],
           ),
-          const RetroDivider(),
+          const SizedBox(height: 12),
           if (_loading)
-            const RetroLoading(message: 'LOADING...')
+            const RetroLoading(message: 'LOADING YOUR MAIL')
           else if (_error != null)
             RetroError(_error!, onRetry: _load)
           else if (_letters.isEmpty)
             RetroCard(
-              padding: const EdgeInsets.all(32),
+              title: 'NO SENT LETTERS',
+              titleBarColor: RetroColors.sectionHeaderRed,
+              padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-                  Text('[ NO LETTERS YET ]', style: RetroTextStyles.h3.copyWith(color: RetroColors.textSecondary)),
-                  const SizedBox(height: 12),
-                  Text("You haven't written any letters yet.", style: RetroTextStyles.body, textAlign: TextAlign.center),
+                  Text(
+                    "You haven't dropped any letters yet.",
+                    style: RetroTextStyles.body,
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 16),
-                  RetroButton(label: 'WRITE YOUR FIRST LETTER', onPressed: () => context.go('/letters/new'), isPrimary: true),
+                  RetroButton(
+                    label: '✉ DROP YOUR FIRST LETTER',
+                    onPressed: () => context.go('/letters/new'),
+                    isPrimary: true,
+                  ),
                 ],
               ),
             )
@@ -74,11 +93,15 @@ class _MyLettersPageState extends State<MyLettersPage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _letters.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (_, i) => _SentLetterRow(
-                letter: _letters[i],
-                onTap: () => context.go('/letters/${_letters[i].id}'),
-              ),
+              separatorBuilder: (_, __) => const SizedBox(height: 0),
+              itemBuilder: (_, i) {
+                final letter = _letters[i];
+                return _SentLetterRow(
+                  letter: letter,
+                  index: i,
+                  onTap: () => context.go('/letters/${letter.id}'),
+                );
+              },
             ),
         ],
       ),
@@ -86,46 +109,99 @@ class _MyLettersPageState extends State<MyLettersPage> {
   }
 }
 
-class _SentLetterRow extends StatelessWidget {
+class _SentLetterRow extends StatefulWidget {
   final Letter letter;
+  final int index;
   final VoidCallback onTap;
-  const _SentLetterRow({required this.letter, required this.onTap});
+  const _SentLetterRow({required this.letter, required this.index, required this.onTap});
+
+  @override
+  State<_SentLetterRow> createState() => _SentLetterRowState();
+}
+
+class _SentLetterRowState extends State<_SentLetterRow> {
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
     final fmt = DateFormat('dd MMM yyyy');
-    return RetroCard(
-      onTap: onTap,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(letter.title, style: RetroTextStyles.h3),
-                const SizedBox(height: 4),
-                if (letter.artist != null)
-                  Text('Artist: ${letter.artist!.displayHandle}', style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary))
-                else
-                  Text('Waiting for an artist...', style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary, fontStyle: FontStyle.italic)),
-                const SizedBox(height: 4),
-                Text(fmt.format(letter.createdAt), style: RetroTextStyles.small.copyWith(color: RetroColors.border)),
-              ],
+    final isEven = widget.index.isEven;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: _hovered
+                ? const Color(0xFFDDEEFF)
+                : (isEven ? RetroColors.surface : const Color(0xFFF5F5F8)),
+            border: const Border(
+              bottom: BorderSide(color: RetroColors.border, width: 1),
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              StatusBadge(letter.status),
-              if (letter.replyCount != null && letter.replyCount! > 0) ...
-                [
-                  const SizedBox(height: 4),
-                  Text('${letter.replyCount} replies', style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary)),
-                ],
+              // Status icon
+              SizedBox(
+                width: 20,
+                child: Text(
+                  widget.letter.isDelivered ? '★' : widget.letter.isClaimed ? '►' : '✉',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: widget.letter.isDelivered
+                        ? RetroColors.accentGreen
+                        : widget.letter.isClaimed
+                            ? RetroColors.sectionHeader
+                            : RetroColors.accentOrange,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Title
+              Expanded(
+                flex: 3,
+                child: Text(
+                  widget.letter.title,
+                  style: RetroTextStyles.vt323.copyWith(
+                    fontSize: 18,
+                    color: _hovered ? RetroColors.link : RetroColors.textPrimary,
+                    decoration: _hovered ? TextDecoration.underline : TextDecoration.none,
+                    decorationColor: RetroColors.link,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Artist
+              Expanded(
+                flex: 2,
+                child: Text(
+                  widget.letter.artist != null
+                      ? 'Artist: ${widget.letter.artist!.displayHandle}'
+                      : 'Awaiting an artist...',
+                  style: RetroTextStyles.small.copyWith(
+                    color: RetroColors.textSecondary,
+                    fontStyle: widget.letter.artist == null ? FontStyle.italic : FontStyle.normal,
+                    fontSize: 11,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Date
+              Text(
+                fmt.format(widget.letter.createdAt),
+                style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary, fontSize: 10),
+              ),
+              const SizedBox(width: 8),
+              StatusBadge(widget.letter.status),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

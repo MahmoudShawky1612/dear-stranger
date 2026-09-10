@@ -73,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return RetroScaffold(body: const RetroLoading(message: 'LOADING PROFILE...'));
+    if (_loading) return RetroScaffold(body: const RetroLoading(message: 'LOADING PROFILE'));
     if (_error != null) return RetroScaffold(body: RetroError(_error!, onRetry: _load));
     final me = context.select<AuthProvider, int?>((a) => a.user?.id);
     final isAuth = context.select<AuthProvider, bool>((a) => a.isAuthenticated);
@@ -84,22 +84,27 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Profile card
+          // Profile header
           RetroCard(
+            title: isOwner ? 'MY SPACE — ${_user!.displayHandle.toUpperCase()}' : '${_user!.displayHandle.toUpperCase()}\'S SPACE',
+            titleBarColor: RetroColors.sectionHeaderPurple,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar
+                // Large avatar (MySpace style)
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
-                    border: Border.all(color: RetroColors.border, width: 2),
-                    color: RetroColors.background,
+                    border: Border.all(color: RetroColors.sectionHeaderPurple, width: 3),
+                    color: RetroColors.pageBackground,
                   ),
                   child: _user?.avatarUrl != null
-                      ? Image.network(_user!.avatarUrl!, fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const _AvatarPlaceholder())
+                      ? Image.network(
+                          _user!.avatarUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const _AvatarPlaceholder(),
+                        )
                       : const _AvatarPlaceholder(),
                 ),
                 const SizedBox(width: 16),
@@ -107,97 +112,166 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_user!.displayHandle, style: RetroTextStyles.h2),
-                      Text('@${_user!.username}', style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary)),
-                      if (_user!.bio != null) ...
-                        [const SizedBox(height: 8), Text(_user!.bio!, style: RetroTextStyles.body)],
+                      Text(_user!.displayHandle, style: RetroTextStyles.vt323.copyWith(fontSize: 28)),
+                      Text(
+                        '@${_user!.username}',
+                        style: RetroTextStyles.small.copyWith(color: RetroColors.link),
+                      ),
+                      if (_user!.bio != null) ...[
+                        const SizedBox(height: 8),
+                        Text(_user!.bio!, style: RetroTextStyles.body),
+                      ],
                       const SizedBox(height: 8),
+                      // Info chips
                       Wrap(
-                        spacing: 16,
+                        spacing: 12,
+                        runSpacing: 4,
                         children: [
-                          if (_user!.location != null)         _InfoChip('📍 ${_user!.location!}'),
-                          if (_user!.favoriteMedium != null)   _InfoChip('🎨 ${_user!.favoriteMedium!}'),
-                          if (_user!.currentlyDrawing != null) _InfoChip('✏️ ${_user!.currentlyDrawing!}'),
-                          if (_user!.createdAt != null)       _InfoChip('📅 Since ${fmt.format(_user!.createdAt!)}'),
+                          if (_user!.location != null)
+                            _InfoTag('📍 ${_user!.location!}'),
+                          if (_user!.favoriteMedium != null)
+                            _InfoTag('🎨 ${_user!.favoriteMedium!}'),
+                          if (_user!.currentlyDrawing != null)
+                            _InfoTag('✏️ Working on: ${_user!.currentlyDrawing!}'),
+                          if (_user!.createdAt != null)
+                            _InfoTag('📅 Member since ${fmt.format(_user!.createdAt!)}'),
                         ],
                       ),
                     ],
                   ),
                 ),
                 if (isOwner)
-                  RetroButton(label: 'EDIT PROFILE', onPressed: () => context.go('/settings'), isSmall: true),
+                  RetroButton(
+                    label: '✏ EDIT PROFILE',
+                    onPressed: () => context.go('/settings'),
+                    isSmall: true,
+                  ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Guestbook
-          Text('📖 GUESTBOOK', style: RetroTextStyles.h2),
-          const RetroDivider(),
-          if (isAuth && !isOwner) ...
-            [
-              RetroCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text('Leave a message:', style: RetroTextStyles.label),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _gbCtrl,
-                      maxLines: 3,
-                      style: RetroTextStyles.typewriter.copyWith(fontSize: 14),
-                      decoration: const InputDecoration(hintText: 'Say something nice...'),
-                    ),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: _sendingEntry
-                          ? const RetroLoading()
-                          : RetroButton(label: 'SIGN GUESTBOOK', onPressed: _postEntry, isPrimary: true, isSmall: true),
-                    ),
-                  ],
-                ),
+          Container(
+            color: RetroColors.sectionHeader,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Text('■ 📖 GUESTBOOK', style: RetroTextStyles.sectionTitle),
+          ),
+          const SizedBox(height: 8),
+
+          if (isAuth && !isOwner) ...[
+            RetroCard(
+              title: 'LEAVE A MESSAGE',
+              titleBarColor: RetroColors.sectionHeaderPurple,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: _gbCtrl,
+                    maxLines: 3,
+                    style: RetroTextStyles.typewriter.copyWith(fontSize: 14),
+                    decoration: const InputDecoration(hintText: 'Say something nice...'),
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: _sendingEntry
+                        ? const RetroLoading()
+                        : RetroButton(
+                            label: '✍ SIGN GUESTBOOK',
+                            onPressed: _postEntry,
+                            isPrimary: true,
+                            isSmall: true,
+                          ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-            ],
+            ),
+            const SizedBox(height: 10),
+          ],
+
           if (_entries.isEmpty)
             RetroCard(
               padding: const EdgeInsets.all(24),
-              child: Text('No entries yet. Be the first!', style: RetroTextStyles.body, textAlign: TextAlign.center),
+              child: Text(
+                'No guestbook entries yet. Be the first to sign!',
+                style: RetroTextStyles.body.copyWith(color: RetroColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
             )
           else
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _entries.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              separatorBuilder: (_, __) => const SizedBox(height: 0),
               itemBuilder: (_, i) {
                 final e = _entries[i];
                 final canDelete = me == e.author.id || isOwner;
-                return RetroCard(
-                  child: Column(
+                return Container(
+                  color: i.isEven ? RetroColors.surface : const Color(0xFFF5F5F8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: const BoxDecoration(
+                    border: Border(bottom: BorderSide(color: RetroColors.border, width: 1)),
+                  ),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => context.go('/profile/${e.author.username}'),
-                            child: Text(e.author.displayHandle, style: RetroTextStyles.link),
+                      // Mini avatar
+                      Container(
+                        width: 32,
+                        height: 32,
+                        color: RetroColors.sectionHeaderPurple,
+                        child: Center(
+                          child: Text(
+                            e.author.displayHandle.isNotEmpty
+                                ? e.author.displayHandle[0].toUpperCase()
+                                : '?',
+                            style: RetroTextStyles.vt323.copyWith(
+                              fontSize: 18,
+                              color: RetroColors.white,
+                            ),
                           ),
-                          const Spacer(),
-                          Text(fmt.format(e.createdAt), style: RetroTextStyles.small.copyWith(color: RetroColors.border)),
-                          if (canDelete) ...
-                            [
-                              const SizedBox(width: 8),
-                              GestureDetector(
-                                onTap: () => _deleteEntry(e.id),
-                                child: Text('[x]', style: RetroTextStyles.pixel.copyWith(fontSize: 7, color: RetroColors.accent)),
-                              ),
-                            ],
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(e.message, style: RetroTextStyles.body),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => context.go('/profile/${e.author.username}'),
+                                  child: Text(e.author.displayHandle, style: RetroTextStyles.link),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  fmt.format(e.createdAt),
+                                  style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary, fontSize: 10),
+                                ),
+                                if (canDelete) ...[
+                                  const SizedBox(width: 8),
+                                  GestureDetector(
+                                    onTap: () => _deleteEntry(e.id),
+                                    child: Text(
+                                      '[delete]',
+                                      style: RetroTextStyles.small.copyWith(
+                                        fontSize: 10,
+                                        color: RetroColors.accent,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: RetroColors.accent,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(e.message, style: RetroTextStyles.body),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -209,13 +283,16 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class _InfoChip extends StatelessWidget {
+class _InfoTag extends StatelessWidget {
   final String text;
-  const _InfoChip(this.text);
+  const _InfoTag(this.text);
 
   @override
-  Widget build(BuildContext context) =>
-      Text(text, style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary));
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        color: const Color(0xFFEEEEFF),
+        child: Text(text, style: RetroTextStyles.small.copyWith(fontSize: 11, color: RetroColors.textPrimary)),
+      );
 }
 
 class _AvatarPlaceholder extends StatelessWidget {
@@ -223,6 +300,9 @@ class _AvatarPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Text('?', style: RetroTextStyles.pixel.copyWith(fontSize: 28, color: RetroColors.border)),
+        child: Text(
+          '?',
+          style: RetroTextStyles.vt323.copyWith(fontSize: 40, color: RetroColors.border),
+        ),
       );
 }

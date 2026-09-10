@@ -14,9 +14,9 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameCtrl  = TextEditingController();
-  final _emailCtrl     = TextEditingController();
-  final _passwordCtrl  = TextEditingController();
+  final _usernameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
   bool _loading = false;
 
   @override
@@ -45,7 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     final error = context.select<AuthProvider, String?>((a) => a.error);
     return Scaffold(
-      backgroundColor: RetroColors.background,
+      backgroundColor: RetroColors.pageBackground,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -53,57 +53,85 @@ class _RegisterPageState extends State<RegisterPage> {
             constraints: const BoxConstraints(maxWidth: 440),
             child: Column(
               children: [
+                // Site banner
                 Container(
                   width: double.infinity,
-                  color: RetroColors.marqueeBar,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF000060), Color(0xFF0000CC), Color(0xFF000060)],
+                    ),
+                  ),
                   padding: const EdgeInsets.all(16),
-                  child: Text('★ DEAR STRANGER ★', style: RetroTextStyles.pixel.copyWith(fontSize: 14, color: RetroColors.white), textAlign: TextAlign.center),
+                  child: Column(
+                    children: [
+                      Text(
+                        '★ dear stranger ★',
+                        style: RetroTextStyles.vt323.copyWith(fontSize: 30, color: RetroColors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        color: RetroColors.accentOrange,
+                        child: Text(
+                          "It's FREE and takes 30 seconds!",
+                          style: RetroTextStyles.pixel.copyWith(fontSize: 7, color: RetroColors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+
                 RetroCard(
+                  title: 'CREATE YOUR ACCOUNT',
+                  titleBarColor: RetroColors.sectionHeaderPurple,
                   child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text('CREATE ACCOUNT', style: RetroTextStyles.h2),
-                        const RetroDivider(),
-                        if (error != null) ...
-                          [
-                            Container(
-                              color: RetroColors.accent.withValues(alpha: 0.1),
-                              padding: const EdgeInsets.all(8),
-                              child: Text('⚠ $error', style: RetroTextStyles.small.copyWith(color: RetroColors.accent)),
+                        if (error != null) ...[
+                          Container(
+                            color: const Color(0xFFFFEEEE),
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              '⚠ $error',
+                              style: RetroTextStyles.small.copyWith(color: RetroColors.accent),
                             ),
-                            const SizedBox(height: 12),
-                          ],
+                          ),
+                          const SizedBox(height: 12),
+                        ],
                         RetroTextField(
                           controller: _usernameCtrl,
-                          label: 'USERNAME',
+                          label: 'USERNAME:',
                           hint: 'letters, numbers, underscores only',
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Required';
-                            if (v.length < 3)  return 'At least 3 characters';
+                            if (v.length < 3) return 'At least 3 characters';
                             if (v.length > 20) return 'Max 20 characters';
-                            if (!RegExp(r'^[a-z0-9_]+$').hasMatch(v.toLowerCase())) return 'Letters, numbers, underscores only';
+                            if (!RegExp(r'^[a-z0-9_]+$').hasMatch(v.toLowerCase())) {
+                              return 'Letters, numbers, underscores only';
+                            }
                             return null;
                           },
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         RetroTextField(
                           controller: _emailCtrl,
-                          label: 'EMAIL',
+                          label: 'E-MAIL ADDRESS:',
                           keyboardType: TextInputType.emailAddress,
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Required';
-                            if (!v.contains('@')) return 'Invalid email';
+                            if (!v.contains('@')) return 'Invalid email address';
                             return null;
                           },
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         RetroTextField(
                           controller: _passwordCtrl,
-                          label: 'PASSWORD',
+                          label: 'PASSWORD:',
                           hint: 'at least 8 characters',
                           obscureText: true,
                           validator: (v) {
@@ -111,15 +139,32 @@ class _RegisterPageState extends State<RegisterPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-                        _loading
-                            ? const RetroLoading(message: 'CREATING ACCOUNT...')
-                            : RetroButton(label: 'CREATE ACCOUNT', onPressed: _submit, isPrimary: true),
                         const SizedBox(height: 16),
+                        _loading
+                            ? const RetroLoading(message: 'CREATING ACCOUNT')
+                            : RetroButton(
+                                label: 'SIGN ME UP! »',
+                                onPressed: _submit,
+                                isPrimary: true,
+                              ),
+                        const SizedBox(height: 12),
                         const RetroDivider(),
+                        Text(
+                          'By creating an account you agree to our terms of service.',
+                          style: RetroTextStyles.small.copyWith(
+                            fontSize: 10,
+                            color: RetroColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () => context.go('/login'),
-                          child: Text('[ Already have an account? Sign in ]', style: RetroTextStyles.link, textAlign: TextAlign.center),
+                          child: Text(
+                            '» Already have an account? Login here',
+                            style: RetroTextStyles.link,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
