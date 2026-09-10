@@ -56,16 +56,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 // Site banner
                 Container(
                   width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF000060), Color(0xFF0000CC), Color(0xFF000060)],
-                    ),
-                  ),
+                  color: RetroColors.headerBg,
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
                       Text(
-                        '★ dear stranger ★',
+                        'dear stranger',
                         style: RetroTextStyles.vt323.copyWith(fontSize: 30, color: RetroColors.white),
                         textAlign: TextAlign.center,
                       ),

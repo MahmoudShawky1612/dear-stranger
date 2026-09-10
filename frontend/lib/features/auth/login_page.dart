@@ -50,21 +50,17 @@ class _LoginPageState extends State<LoginPage> {
                 // Site banner
                 Container(
                   width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF000060), Color(0xFF0000CC), Color(0xFF000060)],
-                    ),
-                  ),
+                  color: RetroColors.headerBg,
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
                       Text(
-                        '★ dear stranger ★',
+                        'dear stranger',
                         style: RetroTextStyles.vt323.copyWith(fontSize: 30, color: RetroColors.white),
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        ':: a letter exchange ::',
+                        'a letter exchange',
                         style: RetroTextStyles.typewriter.copyWith(
                           fontSize: 11, color: RetroColors.silver, fontStyle: FontStyle.italic,
                         ),

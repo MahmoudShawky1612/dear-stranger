@@ -339,117 +339,6 @@ class RetroError extends StatelessWidget {
   }
 }
 
-// ─── Blinking NEW badge ───────────────────────────────────────────────────────
-class BlinkingBadge extends StatefulWidget {
-  final String text;
-  final Color color;
-  const BlinkingBadge({super.key, required this.text, this.color = RetroColors.accent});
-
-  @override
-  State<BlinkingBadge> createState() => _BlinkingBadgeState();
-}
-
-class _BlinkingBadgeState extends State<BlinkingBadge> {
-  late Timer _timer;
-  bool _visible = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 600), (_) {
-      if (mounted) setState(() => _visible = !_visible);
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: _visible ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 100),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        color: widget.color,
-        child: Text(
-          widget.text,
-          style: RetroTextStyles.pixel.copyWith(
-            fontSize: 6,
-            color: RetroColors.white,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Marquee ticker ───────────────────────────────────────────────────────────
-class MarqueeTicker extends StatefulWidget {
-  final List<String> items;
-  const MarqueeTicker({super.key, required this.items});
-
-  @override
-  State<MarqueeTicker> createState() => _MarqueeTickerState();
-}
-
-class _MarqueeTickerState extends State<MarqueeTicker> {
-  late final ScrollController _ctrl;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _startScroll());
-  }
-
-  void _startScroll() {
-    _timer = Timer.periodic(const Duration(milliseconds: 30), (_) {
-      if (!_ctrl.hasClients) return;
-      final max = _ctrl.position.maxScrollExtent;
-      final cur = _ctrl.offset;
-      if (cur >= max) {
-        _ctrl.jumpTo(0);
-      } else {
-        _ctrl.jumpTo(cur + 1.5);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.items.isEmpty) return const SizedBox.shrink();
-    final text = widget.items.map((e) => '★ $e').join('   •   ');
-    return Container(
-      color: RetroColors.headerBg,
-      height: 22,
-      child: SingleChildScrollView(
-        controller: _ctrl,
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Text(
-            '$text   $text   $text',
-            style: RetroTextStyles.marquee,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 // ─── Full app scaffold (shell with header, nav, sidebar, footer) ──────────────
 class RetroScaffold extends StatelessWidget {
   final Widget body;
@@ -473,7 +362,6 @@ class RetroScaffold extends StatelessWidget {
         children: [
           const _SiteHeader(),
           const _NavBar(),
-          const _MarqueeBar(),
           Expanded(
             child: SingleChildScrollView(
               controller: scrollController,
@@ -518,34 +406,20 @@ class _SiteHeader extends StatelessWidget {
     final unread = notifs.unreadCount;
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF000060), Color(0xFF0000CC), Color(0xFF000060)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
+      color: RetroColors.headerBg,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
         children: [
-          // Logo / site name
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '★ dear stranger ★',
-                  style: RetroTextStyles.vt323.copyWith(
-                    fontSize: 32,
-                    color: RetroColors.white,
-                    shadows: [
-                      const Shadow(offset: Offset(2, 2), color: Color(0xFF000033)),
-                      const Shadow(offset: Offset(-1, -1), color: Color(0xFF6666FF)),
-                    ],
-                  ),
+                  'dear stranger',
+                  style: RetroTextStyles.vt323.copyWith(fontSize: 30, color: RetroColors.white),
                 ),
                 Text(
-                  ':: a letter exchange for artists & dreamers since 2024 ::',
+                  'a letter exchange for artists & dreamers',
                   style: RetroTextStyles.typewriter.copyWith(
                     fontSize: 11,
                     color: RetroColors.silver,
@@ -555,39 +429,13 @@ class _SiteHeader extends StatelessWidget {
               ],
             ),
           ),
-          // Top-right: notification bell
           if (unread > 0)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                BlinkingBadge(text: '✉ YOU HAVE MAIL', color: RetroColors.accent),
-                const SizedBox(height: 4),
-                Text(
-                  '$unread unread',
-                  style: RetroTextStyles.typewriter.copyWith(fontSize: 10, color: RetroColors.silver),
-                ),
-              ],
+            Text(
+              '✉ $unread new',
+              style: RetroTextStyles.typewriter.copyWith(fontSize: 12, color: RetroColors.silver),
             ),
         ],
       ),
-    );
-  }
-}
-
-// ─── Marquee activity bar ─────────────────────────────────────────────────────
-class _MarqueeBar extends StatelessWidget {
-  const _MarqueeBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return const MarqueeTicker(
-      items: [
-        'New letters are waiting on the mailboard!',
-        'Drop a letter · an artist will illustrate it for you',
-        'Best experienced at 1024×768 resolution',
-        'Join now — it\'s FREE!',
-        'New artworks delivered today!',
-      ],
     );
   }
 }
@@ -609,7 +457,6 @@ class _NavBar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _NavTab(label: 'HOME', path: '/'),
             _NavTab(label: 'THE MAILBOARD', path: '/'),
             _NavTab(label: 'DROP A LETTER', path: '/letters/new'),
             if (isAuth) ...[
@@ -898,7 +745,6 @@ class _Sidebar extends StatelessWidget {
           _SidebarSection(
             title: 'GETTING AROUND',
             children: [
-              _SidebarLink(label: '» Home', path: '/'),
               _SidebarLink(label: '» The Mailboard', path: '/'),
               _SidebarLink(label: '» Drop a Letter', path: '/letters/new'),
               if (isAuth) ...[
@@ -933,31 +779,6 @@ class _Sidebar extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          // Online counter
-          Container(
-            color: RetroColors.sidebarDark,
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'ONLINE NOW',
-                  style: RetroTextStyles.pixel.copyWith(fontSize: 6, color: RetroColors.accentGold),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Container(width: 8, height: 8, color: const Color(0xFF00FF00)),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${DateTime.now().second % 12 + 3} users',
-                      style: RetroTextStyles.small.copyWith(fontSize: 10, color: RetroColors.textOnSidebar),
-                    ),
-                  ],
-                ),
-              ],
-            ),
           ),
         ],
       ),
