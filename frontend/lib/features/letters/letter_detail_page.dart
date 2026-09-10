@@ -522,10 +522,10 @@ class _ReplyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isEven = index.isEven;
     return Container(
-      color: isEven ? RetroColors.tableRow : RetroColors.tableRowAlt,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       margin: const EdgeInsets.only(bottom: 4),
       decoration: BoxDecoration(
+        color: isEven ? RetroColors.tableRow : RetroColors.tableRowAlt,
         border: Border.all(color: const Color(0xFFE4EBF5), width: 1),
       ),
       child: Row(

@@ -237,9 +237,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 final e = _entries[i];
                 final canDelete = me == e.author.id || isOwner;
                 return Container(
-                  color: i.isEven ? RetroColors.tableRow : RetroColors.tableRowAlt,
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
+                    color: i.isEven ? RetroColors.tableRow : RetroColors.tableRowAlt,
                     border: Border.all(color: const Color(0xFFE4EBF5), width: 1),
                   ),
                   child: Row(
