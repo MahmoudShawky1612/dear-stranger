@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../core/api/users_api.dart';
 import '../../core/models/user.dart';
 import '../../core/models/guestbook_entry.dart';
+import '../../core/models/gallery_item.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/retro_widgets.dart';
@@ -21,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _api = UsersApi();
   User? _user;
   List<GuestbookEntry> _entries = [];
+  List<GalleryItem> _gallery = [];
   bool _loading = true;
   String? _error;
   final _gbCtrl = TextEditingController();
@@ -35,6 +37,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
+  void didUpdateWidget(covariant ProfilePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.username != widget.username) {
+      _gbCtrl.clear();
+      _load();
+    }
+  }
+
+  @override
   void dispose() {
     _gbCtrl.dispose();
     super.dispose();
@@ -43,10 +54,21 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _load() async {
     if (mounted) setState(() { _loading = true; _error = null; });
     try {
-      final user    = await _api.getPublicProfile(widget.username);
+      final user = await _api.getPublicProfile(widget.username);
       final entries = await _api.getGuestbook(widget.username);
+      var gallery = <GalleryItem>[];
+      try {
+        gallery = await _api.getGallery(widget.username);
+      } catch (_) {
+        gallery = const [];
+      }
       if (!mounted) return;
-      setState(() { _user = user; _entries = entries; _loading = false; });
+      setState(() {
+        _user = user;
+        _entries = entries;
+        _gallery = gallery;
+        _loading = false;
+      });
     } catch (e) {
       if (mounted) setState(() { _loading = false; _error = e.toString(); });
     }
@@ -71,6 +93,92 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => _entries.removeWhere((e) => e.id == id));
   }
 
+  void _openArtwork(GalleryItem item) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final fmt = DateFormat('MMM dd, yyyy');
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: double.infinity,
+                  color: RetroColors.headerBg,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  child: Row(
+                    children: [
+                      PixelIcon.palette(size: 14),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          item.letterTitle.isEmpty ? 'Published Artwork' : item.letterTitle,
+                          style: const TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: RetroColors.white,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(ctx).pop(),
+                        child: const Text(
+                          '[X]',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: RetroColors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  color: RetroColors.surface,
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: RetroColors.border, width: 1),
+                        ),
+                        child: Image.network(
+                          item.url,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Text(
+                              '[ Image could not be loaded ]',
+                              style: TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.textSecondary),
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (item.publishedAt != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Published ${fmt.format(item.publishedAt!)}',
+                          style: const TextStyle(fontFamily: 'Arial', fontSize: 10, color: RetroColors.textSecondary),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) return RetroScaffold(body: const RetroLoading(message: 'Loading user profile'));
@@ -84,14 +192,12 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Profile header card (MySpace profile layout)
           RetroCard(
             title: isOwner ? '${_user!.displayHandle}\'s Space (Your Profile)' : '${_user!.displayHandle}\'s Space',
             titleBarColor: RetroColors.sectionHeader,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile Avatar Photo Box
                 Container(
                   width: 110,
                   height: 110,
@@ -133,7 +239,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                       const SizedBox(height: 8),
-                      // Info chips with PixelIcons
                       Wrap(
                         spacing: 12,
                         runSpacing: 4,
@@ -163,40 +268,79 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 14),
 
-          // Guestbook Section
-          Container(
-            color: RetroColors.sectionHeader,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              children: [
-                PixelIcon.doc(size: 14),
-                const SizedBox(width: 8),
-                const Text(
-                  'User Guestbook — Leave a Message for this Stranger',
-                  style: TextStyle(
+          _SectionBar(
+            icon: PixelIcon.palette(size: 14),
+            label: 'Public Gallery — Published Artworks',
+          ),
+          const SizedBox(height: 8),
+          if (_gallery.isEmpty)
+            RetroCard(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: Text(
+                  isOwner
+                      ? 'You have not published any artwork yet. Publish a delivered piece from a letter to hang it here.'
+                      : 'This stranger has not published any artwork yet.',
+                  style: const TextStyle(
                     fontFamily: 'Arial',
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: RetroColors.white,
+                    color: RetroColors.textSecondary,
+                    fontStyle: FontStyle.italic,
                   ),
+                  textAlign: TextAlign.center,
                 ),
+              ),
+            )
+          else
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                for (final item in _gallery)
+                  _GalleryTile(
+                    item: item,
+                    dateLabel: item.publishedAt != null ? fmt.format(item.publishedAt!) : '',
+                    onTap: () => _openArtwork(item),
+                  ),
               ],
             ),
+          const SizedBox(height: 16),
+
+          _SectionBar(
+            icon: PixelIcon.doc(size: 14),
+            label: 'Guestbook — Leave a Letter for this Stranger',
           ),
           const SizedBox(height: 8),
 
           if (isAuth && !isOwner) ...[
             RetroCard(
-              title: 'Sign the Guestbook',
+              title: 'Write a Letter in the Guestbook',
               titleBarColor: const Color(0xFF446699),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextField(
-                    controller: _gbCtrl,
-                    maxLines: 3,
-                    style: const TextStyle(fontFamily: 'Arial', fontSize: 12),
-                    decoration: const InputDecoration(hintText: 'Leave a friendly message on this profile...'),
+                  const Text(
+                    'Leave a short letter on this profile. Keep it kind — this is a public guestbook, not a private mailbox.',
+                    style: TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.textSecondary, height: 1.4),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFFFF8),
+                      border: Border.all(color: const Color(0xFFE8E8E0), width: 1),
+                    ),
+                    child: TextField(
+                      controller: _gbCtrl,
+                      maxLines: 5,
+                      maxLength: 300,
+                      style: RetroTextStyles.typewriter.copyWith(fontSize: 13, height: 1.55),
+                      decoration: const InputDecoration(
+                        hintText: 'Dear stranger,\n\nI saw your space and wanted to say...',
+                        counterText: '',
+                        filled: true,
+                        fillColor: Color(0xFFFFFFF8),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Align(
@@ -204,12 +348,35 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: _sendingEntry
                         ? const RetroLoading()
                         : RetroButton(
-                            label: 'Sign Guestbook >>',
+                            label: 'Leave Letter >>',
                             onPressed: _postEntry,
                             isPrimary: true,
                             isSmall: true,
                             icon: PixelIcon.write(size: 11),
                           ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+          ] else if (!isAuth) ...[
+            RetroCard(
+              title: 'Sign in to Leave a Letter',
+              titleBarColor: const Color(0xFF446699),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Members can leave a letter in this guestbook. Create an account or sign in first.',
+                      style: TextStyle(fontFamily: 'Arial', fontSize: 12, height: 1.4),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  RetroButton(
+                    label: 'Sign In >>',
+                    onPressed: () => context.go('/login'),
+                    isPrimary: true,
+                    isSmall: true,
                   ),
                 ],
               ),
@@ -222,7 +389,7 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: const EdgeInsets.all(20),
               child: const Center(
                 child: Text(
-                  'No guestbook entries yet. Be the first to leave a message!',
+                  'No guestbook letters yet. Be the first to leave a message!',
                   style: TextStyle(fontFamily: 'Arial', fontSize: 12, color: RetroColors.textSecondary, fontStyle: FontStyle.italic),
                 ),
               ),
@@ -245,7 +412,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Mini avatar box
                       Container(
                         width: 32,
                         height: 32,
@@ -311,7 +477,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(height: 3),
                             Text(
                               e.message,
-                              style: const TextStyle(fontFamily: 'Arial', fontSize: 12, height: 1.4),
+                              style: RetroTextStyles.typewriter.copyWith(fontSize: 12, height: 1.45),
                             ),
                           ],
                         ),
@@ -322,6 +488,94 @@ class _ProfilePageState extends State<ProfilePage> {
               },
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _SectionBar extends StatelessWidget {
+  final Widget icon;
+  final String label;
+  const _SectionBar({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: RetroColors.sectionHeader,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      child: Row(
+        children: [
+          icon,
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: RetroColors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GalleryTile extends StatelessWidget {
+  final GalleryItem item;
+  final String dateLabel;
+  final VoidCallback onTap;
+  const _GalleryTile({required this.item, required this.dateLabel, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: SizedBox(
+          width: 168,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 168,
+                height: 126,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF2F5FA),
+                  border: Border.all(color: RetroColors.headerBg, width: 2),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.network(
+                  item.url,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Center(child: PixelIcon.palette(size: 28)),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                item.letterTitle.isEmpty ? 'Untitled' : item.letterTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: RetroColors.link,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+              if (dateLabel.isNotEmpty)
+                Text(
+                  dateLabel,
+                  style: const TextStyle(fontFamily: 'Arial', fontSize: 10, color: RetroColors.textSecondary),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

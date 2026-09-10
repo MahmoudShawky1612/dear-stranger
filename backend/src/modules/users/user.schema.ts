@@ -39,3 +39,14 @@ export const updateProfileSchema = z.object({
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+
+export const searchUsersSchema = z.object({
+  q: z
+    .string()
+    .trim()
+    .min(1, "Search query is required")
+    .max(20, "Search query must be at most 20 characters"),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export type SearchUsersInput = z.infer<typeof searchUsersSchema>;

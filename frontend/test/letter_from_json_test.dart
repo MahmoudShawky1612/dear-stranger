@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dear_stranger/core/models/letter.dart';
 import 'package:dear_stranger/core/models/reply.dart';
+import 'package:dear_stranger/core/models/gallery_item.dart';
 
 void main() {
   test('Letter.fromJson accepts null displayName, dates, and sender', () {
@@ -62,6 +63,23 @@ void main() {
     expect(anonymousReply.author.id, 0);
     expect(anonymousReply.author.displayHandle, 'Anonymous');
     expect(anonymousReply.author.avatarUrl, isNull);
+  });
+
+  test('GalleryItem.fromJson maps public gallery payloads', () {
+    final item = GalleryItem.fromJson({
+      'id': 9,
+      'letterId': 3,
+      'letterTitle': 'A rainy afternoon',
+      'url': 'https://example.com/art.png',
+      'publishedAt': '2026-09-10T12:00:00.000Z',
+      'createdAt': '2026-09-09T12:00:00.000Z',
+    });
+
+    expect(item.id, 9);
+    expect(item.letterId, 3);
+    expect(item.letterTitle, 'A rainy afternoon');
+    expect(item.url, 'https://example.com/art.png');
+    expect(item.publishedAt, isNotNull);
   });
 }
 

@@ -9,6 +9,7 @@ import '../../features/letters/claimed_letters_page.dart';
 import '../../features/letters/letter_detail_page.dart';
 import '../../features/users/profile_page.dart';
 import '../../features/users/settings_page.dart';
+import '../../features/users/user_search_page.dart';
 
 GoRouter buildRouter(AuthProvider auth) => GoRouter(
       refreshListenable: auth,
@@ -35,6 +36,10 @@ GoRouter buildRouter(AuthProvider auth) => GoRouter(
         GoRoute(
           path: '/letters/:id',
           builder: (_, s) => LetterDetailPage(letterId: int.parse(s.pathParameters['id']!)),
+        ),
+        GoRoute(
+          path: '/search',
+          builder: (_, s) => UserSearchPage(initialQuery: s.uri.queryParameters['q'] ?? ''),
         ),
         GoRoute(
           path: '/profile/:username',

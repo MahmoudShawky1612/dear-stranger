@@ -9,9 +9,12 @@ import {
   deleteGuestbookEntry,
   GuestbookEntryNotFoundError,
   NotAllowedError,
+  searchUsers,
+  getPublishedGallery,
 } from "./user.service.js";
 import { createGuestbookEntrySchema } from "./guestbook.schema.js";
 import { paginationSchema } from "../letters/letter.schema.js";
+import { searchUsersSchema } from "./user.schema.js";
 
 
 import {
@@ -210,6 +213,91 @@ export const removeAvatarController = async (
   }
 };
 
+
+export const searchUsersController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const rawQuery =
+    typeof request.query["q"] === "string" ? request.query["q"] : "";
+  const parsed: { q: string; limit?: unknown } = {
+    q: rawQuery.replace(/^@+/, "").trim(),
+  };
+  if (request.query["limit"] !== undefined) {
+    parsed.limit = request.query["limit"];
+  }
+  const result = searchUsersSchema.safeParse(parsed);
+
+  if (!result.success) {
+    response.status(400).json({
+      error: "Invalid search parameters",
+      details: result.error.issues,
+    });
+    return;
+  }
+
+  try {
+    const users = await searchUsers(result.data);
+    const serialized = await Promise.all(
+      users.map(async (user) => ({
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName ?? "",
+        bio: user.bio,
+        avatarUrl: await getAvatarAccessUrl(user.avatarUrl),
+        location: user.location,
+        favoriteMedium: user.favoriteMedium,
+        currentlyDrawing: user.currentlyDrawing,
+        createdAt: user.createdAt,
+      })),
+    );
+
+    response.status(200).json({ users: serialized });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+export const getUserGalleryController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const usernameParam = request.params["username"];
+  const username = typeof usernameParam === "string" ? usernameParam : null;
+
+  if (!username) {
+    response.status(400).json({ error: "Invalid username" });
+    return;
+  }
+
+  const paginationResult = paginationSchema.safeParse(request.query);
+
+  if (!paginationResult.success) {
+    response.status(400).json({
+      error: "Invalid pagination parameters",
+      details: paginationResult.error.issues,
+    });
+    return;
+  }
+
+  try {
+    const { items, nextCursor } = await getPublishedGallery(
+      username,
+      paginationResult.data,
+    );
+
+    response.status(200).json({ items, nextCursor });
+  } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      response.status(404).json({ error: error.message });
+      return;
+    }
+
+    console.error(error);
+    response.status(500).json({ error: "Something went wrong" });
+  }
+};
 
 export const updateMyProfileController = async (
   request: Request,

@@ -752,6 +752,16 @@ class _SiteHeader extends StatelessWidget {
                 ],
               ),
               const Spacer(),
+              Flexible(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 230),
+                    child: const _HeaderSearch(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
               // User / Notification quick link in header
               if (isAuth && user != null) ...[
                 Text(
@@ -862,6 +872,8 @@ class _NavBar extends StatelessWidget {
                 _Pipe(),
                 _NavLink(label: 'Mail Board', path: '/'),
                 _Pipe(),
+                _NavLink(label: 'Find Members', path: '/search'),
+                _Pipe(),
                 _NavLink(label: 'Write a Letter', path: '/letters/new'),
                 if (isAuth) ...[
                   _Pipe(),
@@ -938,6 +950,96 @@ class _NavLinkState extends State<_NavLink> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─── Header member search (early-web directory lookup) ──────────────────────
+class _HeaderSearch extends StatefulWidget {
+  const _HeaderSearch();
+
+  @override
+  State<_HeaderSearch> createState() => _HeaderSearchState();
+}
+
+class _HeaderSearchState extends State<_HeaderSearch> {
+  final _ctrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _go() {
+    var q = _ctrl.text.trim();
+    if (q.startsWith('@')) q = q.substring(1).trim();
+    if (q.isEmpty) {
+      context.go('/search');
+      return;
+    }
+    context.go('/search?q=${Uri.encodeQueryComponent(q)}');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 26,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _ctrl,
+              onSubmitted: (_) => _go(),
+              textInputAction: TextInputAction.search,
+              style: const TextStyle(fontFamily: 'Arial', fontSize: 11, color: Color(0xFF003399)),
+              cursorColor: RetroColors.headerBg,
+              decoration: const InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: RetroColors.white,
+                hintText: 'Find a member...',
+                hintStyle: TextStyle(fontFamily: 'Arial', fontSize: 10, color: Color(0xFF88A0C0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: Color(0xFFB4C6DF), width: 1),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: Color(0xFFB4C6DF), width: 1),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: Color(0xFFFFCC00), width: 1),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: _go,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                height: 26,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                color: RetroColors.btnPrimary,
+                alignment: Alignment.center,
+                child: const Text(
+                  'Go',
+                  style: TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: RetroColors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1171,6 +1273,7 @@ class _Sidebar extends StatelessWidget {
             title: 'Getting Around',
             children: [
               _SidebarLink(label: 'Mail Board', path: '/'),
+              _SidebarLink(label: 'Find Members', path: '/search'),
               _SidebarLink(label: 'Write a Letter', path: '/letters/new'),
               if (isAuth) ...[
                 _SidebarLink(label: 'My Sent Mail', path: '/letters/mine'),

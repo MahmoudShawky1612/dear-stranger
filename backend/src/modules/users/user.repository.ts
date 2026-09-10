@@ -95,19 +95,68 @@ export const updateUserProfile = (
   });
 };
 
+const publicUserSelect = {
+  id: true,
+  username: true,
+  displayName: true,
+  bio: true,
+  avatarUrl: true,
+  location: true,
+  favoriteMedium: true,
+  currentlyDrawing: true,
+  createdAt: true,
+} as const;
+
 export const findPublicUserByUsername = (username: string) => {
-  return prisma.user.findUnique({
-    where: { username },
+  return prisma.user.findFirst({
+    where: {
+      username: {
+        equals: username.trim().toLowerCase(),
+        mode: "insensitive",
+      },
+    },
+    select: publicUserSelect,
+  });
+};
+
+export const searchUsersByUsername = (query: string, limit: number) => {
+  return prisma.user.findMany({
+    where: {
+      username: {
+        contains: query,
+        mode: "insensitive",
+      },
+    },
+    orderBy: { username: "asc" },
+    take: limit,
+    select: publicUserSelect,
+  });
+};
+
+export const findPublishedArtworksByArtistId = (
+  artistId: number,
+  params: { limit: number; cursor?: number },
+) => {
+  return prisma.artwork.findMany({
+    where: {
+      isPublished: true,
+      isAnonymous: false,
+      letter: { artistId },
+      ...(params.cursor ? { id: { lt: params.cursor } } : {}),
+    },
+    orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
+    take: params.limit,
     select: {
       id: true,
-      username: true,
-      displayName: true,
-      bio: true,
-      avatarUrl: true,
-      location: true,
-      favoriteMedium: true,
-      currentlyDrawing: true,
+      letterId: true,
+      storageKey: true,
+      publishedAt: true,
       createdAt: true,
+      letter: {
+        select: {
+          title: true,
+        },
+      },
     },
   });
 };

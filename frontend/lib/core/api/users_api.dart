@@ -1,6 +1,7 @@
 import 'api_client.dart';
 import '../models/user.dart';
 import '../models/guestbook_entry.dart';
+import '../models/gallery_item.dart';
 import '../models/json_parse.dart';
 
 class UsersApi {
@@ -15,9 +16,26 @@ class UsersApi {
     return User.fromJson(map);
   }
 
+  String _userPath(String username) => Uri.encodeComponent(username.trim().toLowerCase());
+
   Future<User> getPublicProfile(String username) async {
-    final d = await _c.get('/users/$username');
+    final d = await _c.get('/users/${_userPath(username)}');
     return _parseUser(d);
+  }
+
+  Future<List<User>> searchUsers(String query, {int limit = 20}) async {
+    var q = query.trim();
+    if (q.startsWith('@')) q = q.substring(1).trim();
+    if (q.isEmpty) return const [];
+    final d = await _c.get('/users/search', query: {'q': q, 'limit': '$limit'});
+    return asJsonMapList(d['users']).map(User.fromJson).toList();
+  }
+
+  Future<List<GalleryItem>> getGallery(String username, {int limit = 20, int? cursor}) async {
+    final q = <String, String>{'limit': '$limit'};
+    if (cursor != null) q['cursor'] = '$cursor';
+    final d = await _c.get('/users/${_userPath(username)}/gallery', query: q);
+    return asJsonMapList(d['items']).map(GalleryItem.fromJson).toList();
   }
 
   Future<User> updateProfile(Map<String, dynamic> fields) async {
@@ -43,12 +61,12 @@ class UsersApi {
   Future<List<GuestbookEntry>> getGuestbook(String username, {int limit = 20, int? cursor}) async {
     final q = <String, String>{'limit': '$limit'};
     if (cursor != null) q['cursor'] = '$cursor';
-    final d = await _c.get('/users/$username/guestbook', query: q);
+    final d = await _c.get('/users/${_userPath(username)}/guestbook', query: q);
     return asJsonMapList(d['entries']).map(GuestbookEntry.fromJson).toList();
   }
 
   Future<GuestbookEntry> writeGuestbookEntry(String username, String message) async {
-    final d = await _c.post('/users/$username/guestbook', {'message': message});
+    final d = await _c.post('/users/${_userPath(username)}/guestbook', {'message': message});
     final map = asJsonMap(d['entry']);
     if (map == null) {
       throw const ApiException(500, 'Invalid guestbook response');

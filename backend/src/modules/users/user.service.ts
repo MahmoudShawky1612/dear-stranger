@@ -6,10 +6,13 @@ import {
   findPublicUserByUsername,
   findGuestbookEntryById,
   findGuestbookEntries,
+  searchUsersByUsername,
+  findPublishedArtworksByArtistId,
 } from "./user.repository.js";
-import type { UpdateProfileInput } from "./user.schema.js";
+import type { UpdateProfileInput, SearchUsersInput } from "./user.schema.js";
 import type { CreateGuestbookEntryInput } from "./guestbook.schema.js";
 import type { PaginationInput } from "../letters/letter.schema.js";
+import { signArtworkStorageKey } from "../letters/artwork.access.service.js";
 
 export class GuestbookEntryNotFoundError extends Error {
   constructor() {
@@ -71,6 +74,57 @@ export const getPublicProfileByUsername = async (username: string) => {
   }
 
   return user;
+};
+
+export const searchUsers = async (input: SearchUsersInput) => {
+  const query = input.q.replace(/^@+/, "").trim();
+  if (!query) {
+    return [];
+  }
+
+  return searchUsersByUsername(query, input.limit);
+};
+
+export const getPublishedGallery = async (
+  username: string,
+  pagination: PaginationInput,
+) => {
+  const host = await findPublicUserByUsername(username);
+
+  if (!host) {
+    throw new UserNotFoundError();
+  }
+
+  const params: { limit: number; cursor?: number } = {
+    limit: pagination.limit,
+  };
+
+  if (pagination.cursor !== undefined) {
+    params.cursor = pagination.cursor;
+  }
+
+  const artworks = await findPublishedArtworksByArtistId(host.id, params);
+
+  const items = await Promise.all(
+    artworks.map(async (artwork) => {
+      const signed = await signArtworkStorageKey(artwork.storageKey);
+      return {
+        id: artwork.id,
+        letterId: artwork.letterId,
+        letterTitle: artwork.letter.title,
+        url: signed.url,
+        publishedAt: artwork.publishedAt,
+        createdAt: artwork.createdAt,
+      };
+    }),
+  );
+
+  const nextCursor =
+    artworks.length === pagination.limit
+      ? (artworks[artworks.length - 1]?.id ?? null)
+      : null;
+
+  return { items, nextCursor };
 };
 
 export const createGuestbookEntry = async (

@@ -6,6 +6,8 @@ import {
   createGuestbookEntryController,
   getGuestbookEntriesController,
   deleteGuestbookEntryController,
+  searchUsersController,
+  getUserGalleryController,
   completeAvatarUploadController,
   createAvatarUploadUrlController,
   uploadAvatarDirectController,
@@ -15,6 +17,8 @@ import {
 const router = Router();
 
 router.patch("/me", requireAuthentication, updateMyProfileController);
+
+router.get("/search", searchUsersController);
 
 router.post(
   "/me/avatar/upload-url",
@@ -40,6 +44,8 @@ router.delete(
   requireAuthentication,
   removeAvatarController,
 );
+
+router.get("/:username/gallery", getUserGalleryController);
 
 router.get("/:username/guestbook", getGuestbookEntriesController);
 router.post(

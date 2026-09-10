@@ -26,6 +26,22 @@ export class ArtworkAccessDeniedError extends Error {
   }
 }
 
+export const signArtworkStorageKey = async (storageKey: string) => {
+  const command = new GetObjectCommand({
+    Bucket: bucketName,
+    Key: storageKey,
+  });
+
+  const url = await getSignedUrl(b2, command, {
+    expiresIn: ARTWORK_URL_TTL_SECONDS,
+  });
+
+  return {
+    url,
+    expiresIn: ARTWORK_URL_TTL_SECONDS,
+  };
+};
+
 export const getArtworkAccessUrl = async (
   artworkId: number,
   userId: number,
@@ -56,17 +72,5 @@ export const getArtworkAccessUrl = async (
     throw new ArtworkAccessDeniedError();
   }
 
-  const command = new GetObjectCommand({
-    Bucket: bucketName,
-    Key: artwork.storageKey,
-  });
-
-  const url = await getSignedUrl(b2, command, {
-    expiresIn: ARTWORK_URL_TTL_SECONDS,
-  });
-
-  return {
-    url,
-    expiresIn: ARTWORK_URL_TTL_SECONDS,
-  };
+  return signArtworkStorageKey(artwork.storageKey);
 };
