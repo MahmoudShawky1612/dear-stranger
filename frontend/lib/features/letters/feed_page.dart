@@ -51,47 +51,51 @@ class _FeedPageState extends State<FeedPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Page title bar
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  color: RetroColors.sectionHeader,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          // Section Title Bar (MySpace style)
+          Container(
+            color: RetroColors.sectionHeader,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              children: [
+                PixelIcon.mail(size: 15),
+                const SizedBox(width: 8),
+                const Expanded(
                   child: Text(
-                    '■ THE MAILBOARD',
-                    style: RetroTextStyles.sectionTitle,
+                    'The Mail Board — Recent Letters Awaiting Artists',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: RetroColors.white,
+                    ),
                   ),
                 ),
-              ),
-              if (isAuth)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: RetroButton(
-                    label: '✉ DROP A LETTER',
+                if (isAuth)
+                  RetroButton(
+                    label: 'Write a Letter >>',
                     onPressed: () => context.go('/letters/new'),
                     isPrimary: true,
                     isSmall: true,
+                    icon: PixelIcon.write(size: 12),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 4),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: Text(
-              'Letters awaiting an artist. Pick one up and paint them a picture.',
-              style: RetroTextStyles.small.copyWith(
-                color: RetroColors.textSecondary,
-                fontStyle: FontStyle.italic,
-              ),
+          const SizedBox(height: 3),
+          const Text(
+            'Browse open letters from strangers. Claim one to illustrate and return original art.',
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 11,
+              color: RetroColors.textSecondary,
+              fontStyle: FontStyle.italic,
             ),
           ),
           const RetroDivider(),
 
-          // Content
+          // Feed Letters
           if ((feed.loading || !feed.loadedOnce) && !feed.hasCachedLetters)
-            const RetroLoading(message: 'LOADING THE MAILBOARD')
+            const RetroLoading(message: 'Loading letters from the mailboard')
           else if (feed.error != null && !feed.hasCachedLetters)
             RetroError(feed.error!, onRetry: () => feed.refresh())
           else if (feed.letters.isEmpty)
@@ -105,7 +109,7 @@ class _FeedPageState extends State<FeedPage> {
                 ],
                 if (feed.loadingMore) ...[
                   const SizedBox(height: 12),
-                  const RetroLoading(message: 'LOADING MORE'),
+                  const RetroLoading(message: 'Loading more letters'),
                 ],
               ],
             ),
@@ -122,22 +126,23 @@ class _EmptyFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RetroCard(
-      title: 'NO LETTERS YET',
-      titleBarColor: RetroColors.sectionHeaderRed,
+      title: 'No Letters on the Board',
+      titleBarColor: RetroColors.sectionHeader,
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Text(
-            'The mailboard is empty.\nBe the first to drop a letter!',
-            style: RetroTextStyles.body,
+          const Text(
+            'The mailboard is currently empty.\nBe the first to drop a letter for an artist to read!',
+            style: TextStyle(fontFamily: 'Arial', fontSize: 12, height: 1.5),
             textAlign: TextAlign.center,
           ),
           if (isAuth) ...[
             const SizedBox(height: 16),
             RetroButton(
-              label: '✉ DROP A LETTER',
+              label: 'Write a Letter Now >>',
               onPressed: () => context.go('/letters/new'),
               isPrimary: true,
+              icon: PixelIcon.write(size: 14),
             ),
           ],
         ],
@@ -153,82 +158,119 @@ class _LetterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fmt = DateFormat('dd MMM yyyy');
+    final fmt = DateFormat('MMM dd, yyyy');
     final me = context.select<AuthProvider, int?>((a) => a.user?.id);
     final isMine = letter.isMine || (me != null && letter.sender?.id == me);
 
-    return RetroCard(
+    return GestureDetector(
       onTap: isAuth ? () => context.go('/letters/${letter.id}') : null,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title row
-          Row(
+      child: MouseRegion(
+        cursor: isAuth ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        child: Container(
+          decoration: BoxDecoration(
+            color: RetroColors.surface,
+            border: Border.all(color: RetroColors.border, width: 1),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  letter.title,
-                  style: RetroTextStyles.vt323.copyWith(
-                    fontSize: 20,
-                    color: RetroColors.link,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+              // Blue Top Strip with Title
+              Container(
+                color: const Color(0xFFE8EFF9), // Soft blue title bar
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: Row(
+                  children: [
+                    PixelIcon.doc(size: 13),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        letter.title,
+                        style: const TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: RetroColors.link,
+                          decoration: TextDecoration.underline,
+                          decorationColor: RetroColors.link,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    StatusBadge(letter.status),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-              StatusBadge(letter.status),
+
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Sender + Date row
+                    Row(
+                      children: [
+                        PixelIcon.userIcon(size: 11, color: RetroColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Posted by: ',
+                          style: TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.textSecondary),
+                        ),
+                        Text(
+                          letter.isAnonymous ? 'Anonymous Stranger' : (letter.sender?.displayHandle ?? 'Unknown'),
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: letter.isAnonymous ? RetroColors.textSecondary : RetroColors.link,
+                          ),
+                        ),
+                        const Spacer(),
+                        PixelIcon.calendar(size: 11),
+                        const SizedBox(width: 4),
+                        Text(
+                          fmt.format(letter.createdAt),
+                          style: TextStyle(fontFamily: 'Arial', fontSize: 10, color: RetroColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Letter Preview in Courier typewriter box
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFAFAFA),
+                        border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        letter.message,
+                        style: RetroTextStyles.typewriter.copyWith(fontSize: 12, height: 1.45),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+
+                    if (isAuth) ...[
+                      const SizedBox(height: 6),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: RetroButton(
+                          label: isMine ? 'View Your Letter >>' : 'Read & Claim Letter >>',
+                          onPressed: () => context.go('/letters/${letter.id}'),
+                          isPrimary: !isMine,
+                          isSmall: true,
+                          icon: isMine ? PixelIcon.mail(size: 12) : PixelIcon.palette(size: 12),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 4),
-
-          // Sender + date meta row
-          Row(
-            children: [
-              Text('From: ', style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary)),
-              Text(
-                letter.isAnonymous ? 'Anonymous' : (letter.sender?.displayHandle ?? 'Unknown'),
-                style: letter.isAnonymous
-                    ? RetroTextStyles.small.copyWith(fontStyle: FontStyle.italic, color: RetroColors.textSecondary)
-                    : RetroTextStyles.small.copyWith(color: RetroColors.link, decoration: TextDecoration.underline, decorationColor: RetroColors.link),
-              ),
-              const Spacer(),
-              Text(
-                fmt.format(letter.createdAt),
-                style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary, fontSize: 10),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-
-          // Letter preview
-          Container(
-            width: double.infinity,
-            color: const Color(0xFFF9F9F9),
-            padding: const EdgeInsets.all(8),
-            child: Text(
-              letter.message,
-              style: RetroTextStyles.typewriter.copyWith(fontSize: 13, color: RetroColors.textPrimary),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-
-          if (isAuth) ...[
-            const SizedBox(height: 8),
-            const RetroDivider(),
-            Align(
-              alignment: Alignment.centerRight,
-              child: RetroButton(
-                label: isMine ? '» VIEW YOUR LETTER' : '» READ & CLAIM',
-                onPressed: () => context.go('/letters/${letter.id}'),
-                isPrimary: !isMine,
-                isSmall: true,
-              ),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }

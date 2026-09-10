@@ -68,7 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
       });
       if (!mounted) return;
       context.read<AuthProvider>().updateUser(updated);
-      setState(() { _saving = false; _success = 'Profile updated!'; });
+      setState(() { _saving = false; _success = 'Profile updated successfully!'; });
     } catch (e) {
       setState(() { _saving = false; _error = e.toString(); });
     }
@@ -96,7 +96,7 @@ class _SettingsPageState extends State<SettingsPage> {
       final updated = await _api.uploadAvatarFile(bytes: file.bytes!, contentType: contentType);
       if (!mounted) return;
       context.read<AuthProvider>().updateUser(updated);
-      setState(() { _avatarLoading = false; _success = 'Profile picture updated!'; });
+      setState(() { _avatarLoading = false; _success = 'Profile photo updated!'; });
     } catch (e) {
       if (mounted) setState(() { _avatarLoading = false; _error = e.toString(); });
     }
@@ -123,7 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
           createdAt: u.createdAt,
         ));
       }
-      setState(() { _avatarLoading = false; _success = 'Profile picture removed.'; });
+      setState(() { _avatarLoading = false; _success = 'Profile photo removed.'; });
     } catch (e) {
       setState(() { _avatarLoading = false; _error = e.toString(); });
     }
@@ -138,69 +138,87 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Page title
+            // Page title strip
             Row(
               children: [
                 Expanded(
                   child: Container(
-                    color: RetroColors.sectionHeaderPurple,
+                    color: RetroColors.sectionHeader,
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    child: Text('■ MY SPACE — EDIT PROFILE', style: RetroTextStyles.sectionTitle),
+                    child: Row(
+                      children: [
+                        PixelIcon.userIcon(size: 15, color: RetroColors.white),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Edit Profile & Settings',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: RetroColors.white,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 if (user != null) ...[
                   const SizedBox(width: 8),
                   RetroButton(
-                    label: '» VIEW MY PROFILE',
+                    label: 'View Public Profile >>',
                     onPressed: () => context.go('/profile/${user.username}'),
                     isSmall: true,
                   ),
                 ],
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
 
             // Success / Error banners
             if (_success != null)
               Container(
                 width: double.infinity,
-                color: const Color(0xFFDDFFDD),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDDFFDD),
+                  border: Border.all(color: RetroColors.accentGreen, width: 1),
+                ),
                 padding: const EdgeInsets.all(8),
                 margin: const EdgeInsets.only(bottom: 10),
                 child: Text(
-                  '✓ $_success',
-                  style: RetroTextStyles.small.copyWith(color: RetroColors.accentGreen),
+                  'Success: $_success',
+                  style: const TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.accentGreen, fontWeight: FontWeight.bold),
                 ),
               ),
             if (_error != null)
               Container(
                 width: double.infinity,
-                color: const Color(0xFFFFEEEE),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEEEE),
+                  border: Border.all(color: RetroColors.accent, width: 1),
+                ),
                 padding: const EdgeInsets.all(8),
                 margin: const EdgeInsets.only(bottom: 10),
                 child: Text(
-                  '⚠ $_error',
-                  style: RetroTextStyles.small.copyWith(color: RetroColors.accent),
+                  'Error: $_error',
+                  style: const TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.accent),
                 ),
               ),
 
-            // Profile picture section
+            // Profile picture section (MySpace photo box style)
             RetroCard(
-              title: 'PROFILE PICTURE',
+              title: 'Profile Picture',
               titleBarColor: RetroColors.sectionHeader,
               child: Row(
                 children: [
-                  // Avatar with dotted border (MySpace style)
                   Container(
                     width: 90,
                     height: 90,
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: RetroColors.sectionHeader,
-                        width: 2,
-                        style: BorderStyle.solid,
+                        color: const Color(0xFFB4C6DF),
+                        width: 1,
                       ),
-                      color: RetroColors.pageBackground,
+                      color: const Color(0xFFF2F5FA),
                     ),
                     child: user?.avatarUrl != null
                         ? Image.network(
@@ -215,9 +233,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'JPG, PNG, or WebP · Max 2 MB',
-                          style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary),
+                        const Text(
+                          'Upload a JPG, PNG, or WebP image (max 2 MB). This will appear on your profile and guestbook entries.',
+                          style: TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.textSecondary),
                         ),
                         const SizedBox(height: 10),
                         Wrap(
@@ -227,13 +245,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             _avatarLoading
                                 ? const RetroLoading()
                                 : RetroButton(
-                                    label: '📎 UPLOAD PHOTO',
+                                    label: 'Upload New Photo >>',
                                     onPressed: _uploadAvatar,
                                     isSmall: true,
+                                    icon: PixelIcon.doc(size: 11),
                                   ),
                             if (user?.avatarUrl != null)
                               RetroButton(
-                                label: 'REMOVE',
+                                label: 'Remove Photo',
                                 onPressed: _removeAvatar,
                                 isSmall: true,
                                 isDanger: true,
@@ -250,27 +269,28 @@ class _SettingsPageState extends State<SettingsPage> {
 
             // Profile info
             RetroCard(
-              title: 'ABOUT ME',
+              title: 'About Me & Interests',
               titleBarColor: RetroColors.sectionHeader,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  RetroTextField(controller: _displayNameCtrl, label: 'DISPLAY NAME:', hint: 'Your name or alias'),
-                  const SizedBox(height: 12),
-                  RetroTextField(controller: _bioCtrl, label: 'BIO:', hint: 'Tell everyone about yourself', maxLines: 4),
-                  const SizedBox(height: 12),
-                  RetroTextField(controller: _locationCtrl, label: 'LOCATION:', hint: 'e.g. Cairo, Egypt'),
-                  const SizedBox(height: 12),
-                  RetroTextField(controller: _mediumCtrl, label: 'FAVORITE MEDIUM:', hint: 'e.g. Watercolor, Digital'),
-                  const SizedBox(height: 12),
-                  RetroTextField(controller: _drawingCtrl, label: 'CURRENTLY DRAWING:', hint: 'What are you working on?'),
-                  const SizedBox(height: 16),
+                  RetroTextField(controller: _displayNameCtrl, label: 'Display Name / Nickname:', hint: 'Your name or alias'),
+                  const SizedBox(height: 10),
+                  RetroTextField(controller: _bioCtrl, label: 'About Me (Bio):', hint: 'Tell everyone about yourself...', maxLines: 4),
+                  const SizedBox(height: 10),
+                  RetroTextField(controller: _locationCtrl, label: 'Location / City:', hint: 'e.g. Cairo, Egypt'),
+                  const SizedBox(height: 10),
+                  RetroTextField(controller: _mediumCtrl, label: 'Favorite Art Medium:', hint: 'e.g. Watercolor, Ink, Digital, Colored Pencils'),
+                  const SizedBox(height: 10),
+                  RetroTextField(controller: _drawingCtrl, label: 'Currently Working On:', hint: 'What project are you drawing?'),
+                  const SizedBox(height: 14),
                   _saving
-                      ? const RetroLoading(message: 'SAVING YOUR PROFILE')
+                      ? const RetroLoading(message: 'Saving changes')
                       : RetroButton(
-                          label: '✓ UPDATE MY PROFILE',
+                          label: 'Save Profile Changes >>',
                           onPressed: _save,
                           isPrimary: true,
+                          icon: PixelIcon.star(size: 12),
                         ),
                 ],
               ),
@@ -279,10 +299,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
             // Account
             RetroCard(
-              title: 'ACCOUNT',
-              titleBarColor: RetroColors.sectionHeaderRed,
+              title: 'Account Options',
+              titleBarColor: const Color(0xFF666666),
               child: RetroButton(
-                label: 'SIGN OUT',
+                label: 'Sign Out of Account',
                 onPressed: () async {
                   await context.read<AuthProvider>().logout();
                   if (context.mounted) context.go('/');
@@ -302,9 +322,6 @@ class _AvatarPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Text(
-          '?',
-          style: RetroTextStyles.vt323.copyWith(fontSize: 40, color: RetroColors.border),
-        ),
+        child: PixelIcon.userIcon(size: 40, color: const Color(0xFFB4C6DF)),
       );
 }

@@ -220,13 +220,13 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
   Widget build(BuildContext context) {
     final me = context.select<AuthProvider, int?>((a) => a.user?.id);
 
-    if (_loading) return RetroScaffold(body: const RetroLoading(message: 'LOADING LETTER'));
+    if (_loading) return RetroScaffold(body: const RetroLoading(message: 'Loading letter details'));
     if (_error != null) return RetroScaffold(body: RetroError(_error!, onRetry: _load));
     final l = _letter!;
 
     final isSender = l.isMine || (me != null && l.sender?.id == me);
     final isArtist = me != null && l.artist?.id == me;
-    final fmt = DateFormat('dd MMM yyyy, HH:mm');
+    final fmt = DateFormat('MMM dd, yyyy, HH:mm');
 
     return RetroScaffold(
       body: Column(
@@ -235,107 +235,153 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
           // Breadcrumb
           GestureDetector(
             onTap: () => context.go('/'),
-            child: Text(
-              '« Back to the Mailboard',
-              style: RetroTextStyles.link,
+            child: const MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Text(
+                '« Back to Mail Board',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 11,
+                  color: RetroColors.link,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
-          // The letter itself
+          // The letter card
           RetroCard(
-            title: 'THE LETTER',
+            title: 'The Letter',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    PixelIcon.doc(size: 16),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         l.title,
-                        style: RetroTextStyles.vt323.copyWith(fontSize: 26),
+                        style: const TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: RetroColors.headerBg,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     StatusBadge(l.status),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  'Written by: ${l.isAnonymous && !isSender ? 'Anonymous' : (l.sender?.displayHandle ?? (isSender ? 'You' : '?'))}  ·  ${fmt.format(l.createdAt)}',
-                  style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary),
+                Row(
+                  children: [
+                    PixelIcon.userIcon(size: 11, color: RetroColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Written by: ',
+                      style: TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.textSecondary),
+                    ),
+                    Text(
+                      l.isAnonymous && !isSender ? 'Anonymous' : (l.sender?.displayHandle ?? (isSender ? 'You' : 'Unknown')),
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: l.isAnonymous && !isSender ? RetroColors.textSecondary : RetroColors.link,
+                      ),
+                    ),
+                    const Spacer(),
+                    PixelIcon.calendar(size: 11),
+                    const SizedBox(width: 4),
+                    Text(
+                      fmt.format(l.createdAt),
+                      style: const TextStyle(fontFamily: 'Arial', fontSize: 10, color: RetroColors.textSecondary),
+                    ),
+                  ],
                 ),
                 const RetroDivider(),
-                // Letter body on parchment-ish background
+                // Letter body in typewriter font
                 Container(
                   width: double.infinity,
-                  color: const Color(0xFFFFFDF5),
-                  padding: const EdgeInsets.all(16),
-                  child: Text(l.message, style: RetroTextStyles.typewriter.copyWith(fontSize: 15, height: 1.8)),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFFF8),
+                    border: Border.all(color: const Color(0xFFE8E8E0), width: 1),
+                  ),
+                  padding: const EdgeInsets.all(14),
+                  child: Text(
+                    l.message,
+                    style: RetroTextStyles.typewriter.copyWith(fontSize: 13, height: 1.6),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
           // Action panel
           if (l.isAvailable) ...[
             if (isSender)
-              RetroCard(
-                title: 'YOUR LETTER IS WAITING',
-                titleBarColor: RetroColors.accentGold,
+              const RetroCard(
+                title: 'Letter Status: Waiting on Mailboard',
+                titleBarColor: Color(0xFF446699),
                 child: Text(
-                  'Your letter is posted on the mailboard. An artist will pick it up and draw something for you.',
-                  style: RetroTextStyles.body,
+                  'Your letter is currently waiting on the mailboard. When an artist claims it, you will receive a notification in your mailbox.',
+                  style: TextStyle(fontFamily: 'Arial', fontSize: 12, height: 1.4),
                 ),
               )
             else
               RetroCard(
-                title: 'INTERESTED IN THIS LETTER?',
-                titleBarColor: RetroColors.sectionHeaderPurple,
+                title: 'Claim This Letter',
+                titleBarColor: RetroColors.sectionHeader,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Pick it up, draw something inspired by it, and deliver it back!',
-                      style: RetroTextStyles.body,
+                    const Text(
+                      'Are you inspired by this letter? Pick it up to create an illustration for this stranger!',
+                      style: TextStyle(fontFamily: 'Arial', fontSize: 12),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     _claimLoading
-                        ? const RetroLoading(message: 'PICKING UP LETTER')
+                        ? const RetroLoading(message: 'Claiming letter')
                         : RetroButton(
-                            label: '► PICK IT UP ◄',
+                            label: 'Claim This Letter to Illustrate >>',
                             onPressed: _claim,
                             isPrimary: true,
+                            icon: PixelIcon.palette(size: 13),
                           ),
                   ],
                 ),
               ),
           ] else if (l.isClaimed && isArtist) ...[
             RetroCard(
-              title: '📎 ATTACH YOUR DRAWING',
+              title: 'Attach Artwork',
               titleBarColor: RetroColors.sectionHeader,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Paint or draw something inspired by this letter, then attach your image below.',
-                    style: RetroTextStyles.body,
+                  const Text(
+                    'Paint or draw something inspired by this letter, then upload your artwork file below (JPEG, PNG, or WebP).',
+                    style: TextStyle(fontFamily: 'Arial', fontSize: 12),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   _uploadLoading
-                      ? const RetroLoading(message: 'UPLOADING YOUR ART')
+                      ? const RetroLoading(message: 'Uploading artwork')
                       : RetroButton(
-                          label: '📎 ATTACH YOUR DRAWING',
+                          label: 'Attach Artwork File >>',
                           onPressed: _uploadArtwork,
                           isPrimary: true,
+                          icon: PixelIcon.palette(size: 13),
                         ),
                 ],
               ),
             ),
           ] else if (l.artwork != null) ...[
             RetroCard(
-              title: '🎨 THE ARTWORK',
+              title: 'Original Artwork',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -344,10 +390,11 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         RetroButton(
-                          label: '🌍 SHARE WITH EVERYONE',
+                          label: 'Publish to Public Gallery >>',
                           onPressed: _publishLoading ? null : _publishArtwork,
                           isPrimary: true,
                           isSmall: true,
+                          icon: PixelIcon.star(size: 11),
                         ),
                       ],
                     ),
@@ -359,35 +406,47 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           color: RetroColors.accentGreen,
-                          child: Text(
-                            '★ PUBLISHED TO GALLERY ★',
-                            style: RetroTextStyles.pixel.copyWith(fontSize: 6, color: RetroColors.white),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              PixelIcon.star(size: 10),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'PUBLISHED TO PUBLIC GALLERY',
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: RetroColors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   if (_artworkLoading)
-                    const RetroLoading(message: 'LOADING IMAGE')
+                    const RetroLoading(message: 'Loading image')
                   else if (_artworkUrl != null)
                     Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: RetroColors.border, width: 2),
+                        border: Border.all(color: RetroColors.border, width: 1),
                       ),
                       child: Image.network(
                         _artworkUrl!,
                         fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => Padding(
-                          padding: const EdgeInsets.all(16),
+                        errorBuilder: (_, __, ___) => const Padding(
+                          padding: EdgeInsets.all(16),
                           child: Text(
-                            '[ IMAGE UNAVAILABLE ]',
-                            style: RetroTextStyles.pixel.copyWith(fontSize: 8, color: RetroColors.textSecondary),
+                            '[ Image could not be loaded ]',
+                            style: TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.textSecondary),
                           ),
                         ),
                       ),
                     )
                   else
-                    Text('Artwork uploaded. Loading preview...', style: RetroTextStyles.body),
+                    const Text('Artwork uploaded. Loading preview...', style: TextStyle(fontFamily: 'Arial', fontSize: 12)),
                 ],
               ),
             ),
@@ -395,16 +454,18 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
 
           // Reply thread — only for delivered letters
           if (l.isDelivered) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             RetroCard(
-              title: '💬 MESSAGES',
+              title: 'Correspondence & Messages',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (l.replies.isEmpty)
-                    Text(
-                      'No messages yet. Start the conversation!',
-                      style: RetroTextStyles.body.copyWith(
+                    const Text(
+                      'No messages yet. Send a response to the artist!',
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 12,
                         color: RetroColors.textSecondary,
                         fontStyle: FontStyle.italic,
                       ),
@@ -415,7 +476,7 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
                     ),
 
                   if (isSender || isArtist) ...[
-                    const RetroDivider(label: 'YOUR REPLY'),
+                    const RetroDivider(label: 'SEND A MESSAGE'),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -423,9 +484,9 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
                           child: TextField(
                             controller: _replyCtrl,
                             maxLines: 3,
-                            style: RetroTextStyles.typewriter.copyWith(fontSize: 14),
+                            style: const TextStyle(fontFamily: 'Arial', fontSize: 12),
                             decoration: const InputDecoration(
-                              hintText: 'Your message:',
+                              hintText: 'Type your message here...',
                             ),
                           ),
                         ),
@@ -433,9 +494,10 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
                         _sendingReply
                             ? const RetroLoading()
                             : RetroButton(
-                                label: 'SEND REPLY »',
+                                label: 'Send Reply >>',
                                 onPressed: _sendReply,
                                 isPrimary: true,
+                                icon: PixelIcon.chat(size: 12),
                               ),
                       ],
                     ),
@@ -460,29 +522,25 @@ class _ReplyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isEven = index.isEven;
     return Container(
-      color: isEven ? RetroColors.surface : const Color(0xFFF0F0F8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      color: isEven ? RetroColors.tableRow : RetroColors.tableRowAlt,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFE4EBF5), width: 1),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar placeholder (like old forum posts)
+          // Avatar silhouette
           Container(
-            width: 36,
-            height: 36,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: RetroColors.pageBackground,
+              color: const Color(0xFFD5E4F7),
               border: Border.all(color: RetroColors.border, width: 1),
             ),
             child: Center(
-              child: Text(
-                (reply.author.displayHandle.isNotEmpty
-                    ? reply.author.displayHandle[0].toUpperCase()
-                    : '?'),
-                style: RetroTextStyles.vt323.copyWith(
-                  fontSize: 20,
-                  color: RetroColors.sectionHeader,
-                ),
-              ),
+              child: PixelIcon.userIcon(size: 18),
             ),
           ),
           const SizedBox(width: 10),
@@ -494,23 +552,26 @@ class _ReplyRow extends StatelessWidget {
                   children: [
                     Text(
                       reply.author.displayHandle,
-                      style: RetroTextStyles.pixel.copyWith(
-                        fontSize: 7,
-                        color: RetroColors.sectionHeader,
+                      style: const TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: RetroColors.link,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       fmt.format(reply.createdAt),
-                      style: RetroTextStyles.small.copyWith(
+                      style: const TextStyle(
+                        fontFamily: 'Arial',
                         color: RetroColors.textSecondary,
                         fontSize: 10,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(reply.message, style: RetroTextStyles.body),
+                const SizedBox(height: 3),
+                Text(reply.message, style: const TextStyle(fontFamily: 'Arial', fontSize: 12, height: 1.4)),
               ],
             ),
           ),
@@ -519,3 +580,4 @@ class _ReplyRow extends StatelessWidget {
     );
   }
 }
+

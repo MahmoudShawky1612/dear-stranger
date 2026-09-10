@@ -73,31 +73,31 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return RetroScaffold(body: const RetroLoading(message: 'LOADING PROFILE'));
+    if (_loading) return RetroScaffold(body: const RetroLoading(message: 'Loading user profile'));
     if (_error != null) return RetroScaffold(body: RetroError(_error!, onRetry: _load));
     final me = context.select<AuthProvider, int?>((a) => a.user?.id);
     final isAuth = context.select<AuthProvider, bool>((a) => a.isAuthenticated);
     final isOwner = me == _user?.id;
-    final fmt = DateFormat('dd MMM yyyy');
+    final fmt = DateFormat('MMM dd, yyyy');
 
     return RetroScaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Profile header
+          // Profile header card (MySpace profile layout)
           RetroCard(
-            title: isOwner ? 'MY SPACE — ${_user!.displayHandle.toUpperCase()}' : '${_user!.displayHandle.toUpperCase()}\'S SPACE',
-            titleBarColor: RetroColors.sectionHeaderPurple,
+            title: isOwner ? '${_user!.displayHandle}\'s Space (Your Profile)' : '${_user!.displayHandle}\'s Space',
+            titleBarColor: RetroColors.sectionHeader,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Large avatar (MySpace style)
+                // Profile Avatar Photo Box
                 Container(
-                  width: 100,
-                  height: 100,
+                  width: 110,
+                  height: 110,
                   decoration: BoxDecoration(
-                    border: Border.all(color: RetroColors.sectionHeaderPurple, width: 3),
-                    color: RetroColors.pageBackground,
+                    border: Border.all(color: const Color(0xFFB4C6DF), width: 1),
+                    color: const Color(0xFFF2F5FA),
                   ),
                   child: _user?.avatarUrl != null
                       ? Image.network(
@@ -112,29 +112,40 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_user!.displayHandle, style: RetroTextStyles.vt323.copyWith(fontSize: 28)),
+                      Text(
+                        _user!.displayHandle,
+                        style: const TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: RetroColors.headerBg,
+                        ),
+                      ),
                       Text(
                         '@${_user!.username}',
-                        style: RetroTextStyles.small.copyWith(color: RetroColors.link),
+                        style: const TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.textSecondary),
                       ),
                       if (_user!.bio != null) ...[
-                        const SizedBox(height: 8),
-                        Text(_user!.bio!, style: RetroTextStyles.body),
+                        const SizedBox(height: 6),
+                        Text(
+                          _user!.bio!,
+                          style: const TextStyle(fontFamily: 'Arial', fontSize: 12, height: 1.4),
+                        ),
                       ],
                       const SizedBox(height: 8),
-                      // Info chips
+                      // Info chips with PixelIcons
                       Wrap(
                         spacing: 12,
                         runSpacing: 4,
                         children: [
                           if (_user!.location != null)
-                            _InfoTag('📍 ${_user!.location!}'),
+                            _InfoTag(icon: PixelIcon.pin(size: 11), text: _user!.location!),
                           if (_user!.favoriteMedium != null)
-                            _InfoTag('🎨 ${_user!.favoriteMedium!}'),
+                            _InfoTag(icon: PixelIcon.palette(size: 11), text: _user!.favoriteMedium!),
                           if (_user!.currentlyDrawing != null)
-                            _InfoTag('✏️ Working on: ${_user!.currentlyDrawing!}'),
+                            _InfoTag(icon: PixelIcon.write(size: 11), text: 'Drawing: ${_user!.currentlyDrawing!}'),
                           if (_user!.createdAt != null)
-                            _InfoTag('📅 Member since ${fmt.format(_user!.createdAt!)}'),
+                            _InfoTag(icon: PixelIcon.calendar(size: 11), text: 'Member since ${fmt.format(_user!.createdAt!)}'),
                         ],
                       ),
                     ],
@@ -142,46 +153,62 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 if (isOwner)
                   RetroButton(
-                    label: '✏ EDIT PROFILE',
+                    label: 'Edit Profile >>',
                     onPressed: () => context.go('/settings'),
                     isSmall: true,
+                    icon: PixelIcon.write(size: 11),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Guestbook
+          // Guestbook Section
           Container(
             color: RetroColors.sectionHeader,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Text('■ 📖 GUESTBOOK', style: RetroTextStyles.sectionTitle),
+            child: Row(
+              children: [
+                PixelIcon.doc(size: 14),
+                const SizedBox(width: 8),
+                const Text(
+                  'User Guestbook — Leave a Message for this Stranger',
+                  style: TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: RetroColors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 8),
 
           if (isAuth && !isOwner) ...[
             RetroCard(
-              title: 'LEAVE A MESSAGE',
-              titleBarColor: RetroColors.sectionHeaderPurple,
+              title: 'Sign the Guestbook',
+              titleBarColor: const Color(0xFF446699),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TextField(
                     controller: _gbCtrl,
                     maxLines: 3,
-                    style: RetroTextStyles.typewriter.copyWith(fontSize: 14),
-                    decoration: const InputDecoration(hintText: 'Say something nice...'),
+                    style: const TextStyle(fontFamily: 'Arial', fontSize: 12),
+                    decoration: const InputDecoration(hintText: 'Leave a friendly message on this profile...'),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerRight,
                     child: _sendingEntry
                         ? const RetroLoading()
                         : RetroButton(
-                            label: '✍ SIGN GUESTBOOK',
+                            label: 'Sign Guestbook >>',
                             onPressed: _postEntry,
                             isPrimary: true,
                             isSmall: true,
+                            icon: PixelIcon.write(size: 11),
                           ),
                   ),
                 ],
@@ -192,11 +219,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
           if (_entries.isEmpty)
             RetroCard(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                'No guestbook entries yet. Be the first to sign!',
-                style: RetroTextStyles.body.copyWith(color: RetroColors.textSecondary),
-                textAlign: TextAlign.center,
+              padding: const EdgeInsets.all(20),
+              child: const Center(
+                child: Text(
+                  'No guestbook entries yet. Be the first to leave a message!',
+                  style: TextStyle(fontFamily: 'Arial', fontSize: 12, color: RetroColors.textSecondary, fontStyle: FontStyle.italic),
+                ),
               ),
             )
           else
@@ -204,34 +232,29 @@ class _ProfilePageState extends State<ProfilePage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _entries.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 0),
+              separatorBuilder: (_, __) => const SizedBox(height: 4),
               itemBuilder: (_, i) {
                 final e = _entries[i];
                 final canDelete = me == e.author.id || isOwner;
                 return Container(
-                  color: i.isEven ? RetroColors.surface : const Color(0xFFF5F5F8),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: const BoxDecoration(
-                    border: Border(bottom: BorderSide(color: RetroColors.border, width: 1)),
+                  color: i.isEven ? RetroColors.tableRow : RetroColors.tableRowAlt,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFFE4EBF5), width: 1),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Mini avatar
+                      // Mini avatar silhouette
                       Container(
                         width: 32,
                         height: 32,
-                        color: RetroColors.sectionHeaderPurple,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD5E4F7),
+                          border: Border.all(color: RetroColors.border, width: 1),
+                        ),
                         child: Center(
-                          child: Text(
-                            e.author.displayHandle.isNotEmpty
-                                ? e.author.displayHandle[0].toUpperCase()
-                                : '?',
-                            style: RetroTextStyles.vt323.copyWith(
-                              fontSize: 18,
-                              color: RetroColors.white,
-                            ),
-                          ),
+                          child: PixelIcon.userIcon(size: 18),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -243,32 +266,44 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 GestureDetector(
                                   onTap: () => context.go('/profile/${e.author.username}'),
-                                  child: Text(e.author.displayHandle, style: RetroTextStyles.link),
+                                  child: Text(
+                                    e.author.displayHandle,
+                                    style: const TextStyle(
+                                      fontFamily: 'Arial',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: RetroColors.link,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
                                 ),
                                 const Spacer(),
                                 Text(
                                   fmt.format(e.createdAt),
-                                  style: RetroTextStyles.small.copyWith(color: RetroColors.textSecondary, fontSize: 10),
+                                  style: const TextStyle(fontFamily: 'Arial', fontSize: 10, color: RetroColors.textSecondary),
                                 ),
                                 if (canDelete) ...[
                                   const SizedBox(width: 8),
                                   GestureDetector(
                                     onTap: () => _deleteEntry(e.id),
-                                    child: Text(
+                                    child: const Text(
                                       '[delete]',
-                                      style: RetroTextStyles.small.copyWith(
+                                      style: TextStyle(
+                                        fontFamily: 'Arial',
                                         fontSize: 10,
                                         color: RetroColors.accent,
                                         decoration: TextDecoration.underline,
-                                        decorationColor: RetroColors.accent,
                                       ),
                                     ),
                                   ),
                                 ],
                               ],
                             ),
-                            const SizedBox(height: 4),
-                            Text(e.message, style: RetroTextStyles.body),
+                            const SizedBox(height: 3),
+                            Text(
+                              e.message,
+                              style: const TextStyle(fontFamily: 'Arial', fontSize: 12, height: 1.4),
+                            ),
                           ],
                         ),
                       ),
@@ -284,14 +319,25 @@ class _ProfilePageState extends State<ProfilePage> {
 }
 
 class _InfoTag extends StatelessWidget {
+  final Widget icon;
   final String text;
-  const _InfoTag(this.text);
+  const _InfoTag({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        color: const Color(0xFFEEEEFF),
-        child: Text(text, style: RetroTextStyles.small.copyWith(fontSize: 11, color: RetroColors.textPrimary)),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE8EFF9),
+          border: Border.all(color: const Color(0xFFC0D2EB), width: 1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            icon,
+            const SizedBox(width: 4),
+            Text(text, style: const TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.textPrimary)),
+          ],
+        ),
       );
 }
 
@@ -300,9 +346,6 @@ class _AvatarPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Text(
-          '?',
-          style: RetroTextStyles.vt323.copyWith(fontSize: 40, color: RetroColors.border),
-        ),
+        child: PixelIcon.userIcon(size: 44, color: const Color(0xFFB4C6DF)),
       );
 }

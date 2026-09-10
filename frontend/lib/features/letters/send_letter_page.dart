@@ -40,7 +40,7 @@ class _SendLetterPageState extends State<SendLetterPage> {
       if (!mounted) return;
       context.read<LettersFeedProvider>().refresh(silent: true);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✉ Your letter is now on the mailboard!')),
+        const SnackBar(content: Text('Your letter has been posted to the mailboard!')),
       );
       context.go('/letters/mine');
     } catch (e) {
@@ -56,20 +56,33 @@ class _SendLetterPageState extends State<SendLetterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Page title
+            // Page Title Strip
             Container(
               width: double.infinity,
-              color: RetroColors.sectionHeaderPurple,
+              color: RetroColors.sectionHeader,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              child: Text(
-                '■ ✉ DROP A LETTER IN THE BOX',
-                style: RetroTextStyles.sectionTitle,
+              child: Row(
+                children: [
+                  PixelIcon.write(size: 15),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Drop a Letter into the Mail Box',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: RetroColors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              'Your letter will be posted on the mailboard. An artist will pick it up and paint you a picture.',
-              style: RetroTextStyles.small.copyWith(
+            const Text(
+              'Your letter will appear on the public mailboard. An artist will pick it up and create original artwork inspired by your words.',
+              style: TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 11,
                 color: RetroColors.textSecondary,
                 fontStyle: FontStyle.italic,
               ),
@@ -84,30 +97,33 @@ class _SendLetterPageState extends State<SendLetterPage> {
                   children: [
                     if (_error != null) ...[
                       Container(
-                        color: const Color(0xFFFFEEEE),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFEEEE),
+                          border: Border.all(color: RetroColors.accent, width: 1),
+                        ),
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                          '⚠ $_error',
-                          style: RetroTextStyles.small.copyWith(color: RetroColors.accent),
+                          'Error: $_error',
+                          style: const TextStyle(fontFamily: 'Arial', fontSize: 11, color: RetroColors.accent),
                         ),
                       ),
                       const SizedBox(height: 12),
                     ],
                     RetroTextField(
                       controller: _titleCtrl,
-                      label: 'LETTER TITLE:',
-                      hint: 'What is this letter about?',
+                      label: 'Letter Title / Subject:',
+                      hint: 'Give your letter a title...',
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) return 'Please add a title';
                         if (v.length > 100) return 'Max 100 characters';
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     RetroTextField(
                       controller: _msgCtrl,
-                      label: 'YOUR LETTER:',
-                      hint: 'Write something heartfelt, curious, or strange...',
+                      label: 'Letter Body:',
+                      hint: 'Write something heartfelt, curious, or honest...',
                       maxLines: 12,
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) return 'Please write something';
@@ -115,12 +131,15 @@ class _SendLetterPageState extends State<SendLetterPage> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
 
-                    // Anonymous toggle
+                    // Anonymous toggle (MySpace style shaded box)
                     Container(
-                      color: const Color(0xFFF0F0F8),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0F4FA),
+                        border: Border.all(color: const Color(0xFFD0DCEE), width: 1),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       child: Row(
                         children: [
                           Checkbox(
@@ -129,9 +148,9 @@ class _SendLetterPageState extends State<SendLetterPage> {
                           ),
                           GestureDetector(
                             onTap: () => setState(() => _isAnonymous = !_isAnonymous),
-                            child: Text(
-                              'Send anonymously (hide my username from the artist)',
-                              style: RetroTextStyles.small,
+                            child: const Text(
+                              'Post anonymously (hide my username from the artist)',
+                              style: TextStyle(fontFamily: 'Arial', fontSize: 11),
                             ),
                           ),
                         ],
@@ -140,19 +159,20 @@ class _SendLetterPageState extends State<SendLetterPage> {
                     const SizedBox(height: 16),
 
                     _loading
-                        ? const RetroLoading(message: 'POSTING YOUR LETTER')
+                        ? const RetroLoading(message: 'Posting your letter to the board')
                         : Row(
                             children: [
                               Expanded(
                                 child: RetroButton(
-                                  label: '✉ POST IT!',
+                                  label: 'Post Letter to Board >>',
                                   onPressed: _submit,
                                   isPrimary: true,
+                                  icon: PixelIcon.mail(size: 13),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               RetroButton(
-                                label: 'Never mind',
+                                label: 'Cancel',
                                 onPressed: () => context.go('/'),
                               ),
                             ],
