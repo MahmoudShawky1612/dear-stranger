@@ -331,6 +331,7 @@ if (!username) {
 
   try {
     const entry = await createGuestbookEntry(username, userId, result.data);
+    const avatarUrl = await getAvatarAccessUrl(entry.author.avatarUrl);
 
     response.status(201).json({
       entry: {
@@ -341,6 +342,7 @@ if (!username) {
           id: entry.author.id,
           username: entry.author.username,
           displayName: entry.author.displayName,
+          avatarUrl,
         },
       },
     });
@@ -387,8 +389,8 @@ if (!username) {
       paginationResult.data,
     );
 
-    response.status(200).json({
-      entries: entries.map((entry) => ({
+    const serializedEntries = await Promise.all(
+      entries.map(async (entry) => ({
         id: entry.id,
         message: entry.message,
         createdAt: entry.createdAt,
@@ -396,8 +398,13 @@ if (!username) {
           id: entry.author.id,
           username: entry.author.username,
           displayName: entry.author.displayName,
+          avatarUrl: await getAvatarAccessUrl(entry.author.avatarUrl),
         },
       })),
+    );
+
+    response.status(200).json({
+      entries: serializedEntries,
       nextCursor,
     });
   } catch (error) {

@@ -169,8 +169,8 @@ export const getAvailableLettersController = async (
       paginationResult.data,
     );
 
-    response.status(200).json({
-      letters: letters.map((letter) => {
+    const serializedLetters = await Promise.all(
+      letters.map(async (letter) => {
         const isMine = idsEqual(request.auth?.userId, letter.senderId);
         return {
           id: letter.id,
@@ -183,9 +183,13 @@ export const getAvailableLettersController = async (
           sender:
             letter.isAnonymous && !isMine
               ? null
-              : serializeUserPreview(letter.sender),
+              : await serializeUserPreview(letter.sender),
         };
       }),
+    );
+
+    response.status(200).json({
+      letters: serializedLetters,
       nextCursor,
     });
   } catch (error) {
@@ -448,6 +452,44 @@ export const getLetterController = async (
   try {
     const letter = await getLetterById(letterId, userId);
 
+    const serializedSender =
+      letter.isAnonymous && !idsEqual(letter.senderId, userId)
+        ? null
+        : await serializeUserPreview(letter.sender);
+
+    const serializedArtist = letter.artist
+      ? await serializeUserPreview(letter.artist)
+      : null;
+
+    const serializedReplies = await Promise.all(
+      letter.replies.map(async (reply) => {
+        const replyIsSender = idsEqual(reply.authorId, letter.senderId);
+        const shouldMaskAnonymousSender =
+          letter.isAnonymous && replyIsSender && !idsEqual(letter.senderId, userId);
+
+        if (shouldMaskAnonymousSender) {
+          return {
+            id: reply.id,
+            message: reply.message,
+            createdAt: reply.createdAt,
+            author: {
+              id: 0,
+              username: "Anonymous",
+              displayName: "Anonymous",
+              avatarUrl: null,
+            },
+          };
+        }
+
+        return {
+          id: reply.id,
+          message: reply.message,
+          createdAt: reply.createdAt,
+          author: await serializeUserPreview(reply.author),
+        };
+      }),
+    );
+
     response.status(200).json({
       letter: {
         id: letter.id,
@@ -459,18 +501,10 @@ export const getLetterController = async (
         createdAt: letter.createdAt,
         claimedAt: letter.claimedAt,
         deliveredAt: letter.deliveredAt,
-        sender:
-          letter.isAnonymous && !idsEqual(letter.senderId, userId)
-            ? null
-            : serializeUserPreview(letter.sender),
-        artist: letter.artist ? serializeUserPreview(letter.artist) : null,
+        sender: serializedSender,
+        artist: serializedArtist,
         artwork: letter.artwork ? serializeArtwork(letter.artwork) : null,
-        replies: letter.replies.map((reply) => ({
-          id: reply.id,
-          message: reply.message,
-          createdAt: reply.createdAt,
-          author: serializeUserPreview(reply.author),
-        })),
+        replies: serializedReplies,
       },
     });
   } catch (error) {
@@ -524,7 +558,7 @@ export const createReplyController = async (
         id: reply.id,
         message: reply.message,
         createdAt: reply.createdAt,
-          author: serializeUserPreview(reply.author),
+        author: await serializeUserPreview(reply.author),
       },
     });
   } catch (error) {
@@ -573,8 +607,8 @@ export const getMySentLettersController = async (
       paginationResult.data,
     );
 
-    response.status(200).json({
-      letters: letters.map((letter) => ({
+    const serializedLetters = await Promise.all(
+      letters.map(async (letter) => ({
         id: letter.id,
         title: letter.title,
         message: letter.message,
@@ -584,10 +618,14 @@ export const getMySentLettersController = async (
         createdAt: letter.createdAt,
         claimedAt: letter.claimedAt,
         deliveredAt: letter.deliveredAt,
-        artist: letter.artist ? serializeUserPreview(letter.artist) : null,
+        artist: letter.artist ? await serializeUserPreview(letter.artist) : null,
         artwork: letter.artwork ? serializeArtwork(letter.artwork) : null,
         replyCount: letter._count.replies,
       })),
+    );
+
+    response.status(200).json({
+      letters: serializedLetters,
       nextCursor,
     });
   } catch (error) {
@@ -623,8 +661,8 @@ export const getMyClaimedLettersController = async (
       paginationResult.data,
     );
 
-    response.status(200).json({
-      letters: letters.map((letter) => ({
+    const serializedLetters = await Promise.all(
+      letters.map(async (letter) => ({
         id: letter.id,
         title: letter.title,
         message: letter.message,
@@ -636,10 +674,14 @@ export const getMyClaimedLettersController = async (
         deliveredAt: letter.deliveredAt,
         sender: letter.isAnonymous
           ? null
-          : serializeUserPreview(letter.sender),
+          : await serializeUserPreview(letter.sender),
         artwork: letter.artwork ? serializeArtwork(letter.artwork) : null,
         replyCount: letter._count.replies,
       })),
+    );
+
+    response.status(200).json({
+      letters: serializedLetters,
       nextCursor,
     });
   } catch (error) {

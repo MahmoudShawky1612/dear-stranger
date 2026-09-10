@@ -5,6 +5,7 @@ import {
 import type { CreateReplyInput } from "./reply.schema.js";
 import { broadcastNewReply } from "../../lib/websocket.js";
 import { createAndDispatchNotification } from "../notifications/notification.service.js";
+import { getAvatarAccessUrl } from "../users/avatar.service.js";
 
 export class LetterNotFoundError extends Error {
   constructor() {
@@ -78,19 +79,34 @@ const reply = await createReplyRepository({
   message: input.message,
 });
 
+const isAnonymousSender = isSender && letter.isAnonymous;
+
+const broadcastAuthor = isAnonymousSender
+  ? {
+      id: 0,
+      username: "Anonymous",
+      displayName: "Anonymous",
+      avatarUrl: null,
+    }
+  : {
+      id: reply.author.id,
+      username: reply.author.username,
+      displayName: reply.author.displayName,
+      avatarUrl: await getAvatarAccessUrl(reply.author.avatarUrl),
+    };
+
 broadcastNewReply(letterId, {
   id: reply.id,
   message: reply.message,
   createdAt: reply.createdAt,
-  author: {
-    id: reply.author.id,
-    username: reply.author.username,
-    displayName: reply.author.displayName,
-  },
+  author: broadcastAuthor,
 });
 
 const recipientId = isSender ? Number(letter.artistId) : Number(letter.senderId);
-const authorName = reply.author.displayName || reply.author.username;
+const authorName = isAnonymousSender
+  ? "Anonymous"
+  : (reply.author.displayName || reply.author.username);
+
 createAndDispatchNotification({
   userId: recipientId,
   letterId,

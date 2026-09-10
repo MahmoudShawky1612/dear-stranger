@@ -472,7 +472,23 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
                     )
                   else
                     ...l.replies.asMap().entries.map(
-                      (e) => _ReplyRow(reply: e.value, index: e.key, fmt: fmt),
+                      (e) {
+                        final reply = e.value;
+                        final isReplyByMe = me != null && reply.author.id == me;
+                        final isReplyAuthorSender = isSender
+                            ? isReplyByMe
+                            : (reply.author.username.toLowerCase() == 'anonymous' ||
+                                reply.author.id == 0 ||
+                                (l.sender != null && reply.author.id == l.sender!.id));
+                        return _ReplyRow(
+                          reply: reply,
+                          index: e.key,
+                          fmt: fmt,
+                          isLetterAnonymous: l.isAnonymous,
+                          isMe: isReplyByMe,
+                          isReplyAuthorSender: isReplyAuthorSender,
+                        );
+                      },
                     ),
 
                   if (isSender || isArtist) ...[
@@ -513,14 +529,38 @@ class _LetterDetailPageState extends State<LetterDetailPage> {
 }
 
 class _ReplyRow extends StatelessWidget {
-  final dynamic reply;
+  final Reply reply;
   final int index;
   final DateFormat fmt;
-  const _ReplyRow({required this.reply, required this.index, required this.fmt});
+  final bool isLetterAnonymous;
+  final bool isMe;
+  final bool isReplyAuthorSender;
+
+  const _ReplyRow({
+    required this.reply,
+    required this.index,
+    required this.fmt,
+    required this.isLetterAnonymous,
+    required this.isMe,
+    required this.isReplyAuthorSender,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isEven = index.isEven;
+    final isAnonymousAuthor = isLetterAnonymous && isReplyAuthorSender;
+
+    final String authorName;
+    if (isAnonymousAuthor) {
+      authorName = isMe ? 'You (Anonymous)' : 'Anonymous';
+    } else {
+      authorName = isMe ? 'You' : reply.author.displayHandle;
+    }
+
+    final hasAvatar = !isAnonymousAuthor &&
+        reply.author.avatarUrl != null &&
+        reply.author.avatarUrl!.trim().isNotEmpty;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       margin: const EdgeInsets.only(bottom: 4),
@@ -531,7 +571,7 @@ class _ReplyRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar silhouette
+          // Avatar box
           Container(
             width: 32,
             height: 32,
@@ -539,9 +579,18 @@ class _ReplyRow extends StatelessWidget {
               color: const Color(0xFFD5E4F7),
               border: Border.all(color: RetroColors.border, width: 1),
             ),
-            child: Center(
-              child: PixelIcon.userIcon(size: 18),
-            ),
+            clipBehavior: Clip.antiAlias,
+            child: hasAvatar
+                ? Image.network(
+                    reply.author.avatarUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Center(
+                      child: PixelIcon.userIcon(size: 18),
+                    ),
+                  )
+                : Center(
+                    child: PixelIcon.userIcon(size: 18),
+                  ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -551,12 +600,14 @@ class _ReplyRow extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      reply.author.displayHandle,
-                      style: const TextStyle(
+                      authorName,
+                      style: TextStyle(
                         fontFamily: 'Arial',
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: RetroColors.link,
+                        color: isAnonymousAuthor
+                            ? RetroColors.textSecondary
+                            : RetroColors.link,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -580,4 +631,5 @@ class _ReplyRow extends StatelessWidget {
     );
   }
 }
+
 

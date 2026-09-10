@@ -245,7 +245,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Mini avatar silhouette
+                      // Mini avatar box
                       Container(
                         width: 32,
                         height: 32,
@@ -253,9 +253,18 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: const Color(0xFFD5E4F7),
                           border: Border.all(color: RetroColors.border, width: 1),
                         ),
-                        child: Center(
-                          child: PixelIcon.userIcon(size: 18),
-                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: e.author.avatarUrl != null && e.author.avatarUrl!.trim().isNotEmpty
+                            ? Image.network(
+                                e.author.avatarUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Center(
+                                  child: PixelIcon.userIcon(size: 18),
+                                ),
+                              )
+                            : Center(
+                                child: PixelIcon.userIcon(size: 18),
+                              ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
