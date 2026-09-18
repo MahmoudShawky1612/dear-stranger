@@ -20,14 +20,14 @@ model User {
   currentlyDrawing String?  @map("currently_drawing")
   createdAt        DateTime @default(now()) @map("created_at")
 
-  sentLetters    Letter[]  @relation("sentLetters")
-  claimedLetters Letter[]  @relation("claimedLetters")
-  sessions       Session[]
-  artworkUploads ArtworkUpload[]
-  replies        Reply[]
-  guestbookHosted  GuestbookEntry[]  @relation("guestbookHost")
+  sentLetters       Letter[]         @relation("sentLetters")
+  claimedLetters    Letter[]         @relation("claimedLetters")
+  sessions          Session[]
+  artworkUploads    ArtworkUpload[]
+  replies           Reply[]
+  guestbookHosted   GuestbookEntry[] @relation("guestbookHost")
   guestbookAuthored GuestbookEntry[] @relation("guestbookAuthor")
-  notifications    Notification[]
+  notifications     Notification[]
 
   @@map("users")
 }
@@ -39,20 +39,20 @@ enum LetterStatus {
 }
 
 model Letter {
-  id              Int          @id @default(autoincrement())
-  senderId        Int          @map("sender_id")
-  artistId        Int?         @map("artist_id")
-  title           String
-  message         String
-  status          LetterStatus @default(AVAILABLE)
-  isAnonymous     Boolean      @default(false) @map("is_anonymous")
-  createdAt       DateTime     @default(now()) @map("created_at")
-  claimedAt       DateTime?    @map("claimed_at")
-  deliveredAt     DateTime?    @map("delivered_at")
+  id          Int          @id @default(autoincrement())
+  senderId    Int          @map("sender_id")
+  artistId    Int?         @map("artist_id")
+  title       String
+  message     String
+  status      LetterStatus @default(AVAILABLE)
+  isAnonymous Boolean      @default(false) @map("is_anonymous")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  claimedAt   DateTime?    @map("claimed_at")
+  deliveredAt DateTime?    @map("delivered_at")
 
-  sender   User     @relation("sentLetters", fields: [senderId], references: [id])
-  artist   User?    @relation("claimedLetters", fields: [artistId], references: [id])
-  artwork  Artwork?
+  sender         User            @relation("sentLetters", fields: [senderId], references: [id])
+  artist         User?           @relation("claimedLetters", fields: [artistId], references: [id])
+  artwork        Artwork?
   artworkUploads ArtworkUpload[]
   replies        Reply[]
   notifications  Notification[]
@@ -64,15 +64,15 @@ model Letter {
 }
 
 model Artwork {
-  id             Int       @id @default(autoincrement())
-  letterId       Int       @unique @map("letter_id")
-  storageKey     String    @unique @map("storage_key")
-  contentType    String    @map("content_type")
-  fileSizeBytes  Int       @map("file_size_bytes")
-  isAnonymous    Boolean   @default(false) @map("is_anonymous")
-  isPublished    Boolean   @default(false) @map("is_published")
-  publishedAt    DateTime? @map("published_at")
-  createdAt      DateTime  @default(now()) @map("created_at")
+  id            Int       @id @default(autoincrement())
+  letterId      Int       @unique @map("letter_id")
+  storageKey    String    @unique @map("storage_key")
+  contentType   String    @map("content_type")
+  fileSizeBytes Int       @map("file_size_bytes")
+  isAnonymous   Boolean   @default(false) @map("is_anonymous")
+  isPublished   Boolean   @default(false) @map("is_published")
+  publishedAt   DateTime? @map("published_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
 
   letter Letter @relation(fields: [letterId], references: [id], onDelete: Cascade)
 
@@ -95,14 +95,14 @@ model Session {
 }
 
 model ArtworkUpload {
-  id             Int       @id @default(autoincrement())
-  letterId       Int       @map("letter_id")
-  artistId       Int       @map("artist_id")
-  storageKey     String    @unique @map("storage_key")
-  contentType    String    @map("content_type")
-  expectedSize   Int       @map("expected_size")
-  expiresAt      DateTime  @map("expires_at")
-  createdAt      DateTime  @default(now()) @map("created_at")
+  id           Int      @id @default(autoincrement())
+  letterId     Int      @map("letter_id")
+  artistId     Int      @map("artist_id")
+  storageKey   String   @unique @map("storage_key")
+  contentType  String   @map("content_type")
+  expectedSize Int      @map("expected_size")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
 
   letter Letter @relation(fields: [letterId], references: [id], onDelete: Cascade)
   artist User   @relation(fields: [artistId], references: [id], onDelete: Cascade)
