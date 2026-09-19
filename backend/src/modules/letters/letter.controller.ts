@@ -1,6 +1,6 @@
-import type { Request, Response } from "express";
+﻿import type { Request, Response } from "express";
 import {
-  claimLetter,
+  claimLetter, unclaimLetter,
   createLetter,
   LetterNotAvailableError,
   CannotClaimOwnLetterError,
@@ -799,5 +799,32 @@ export const publishArtworkController = async (
     response.status(500).json({
       error: "Something went wrong",
     });
+  }
+};
+export const unclaimLetterController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const artistId = request.auth?.userId;
+  if (!artistId) {
+    response.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+  const letterId = Number(request.params["id"]);
+  if (!Number.isInteger(letterId) || letterId <= 0) {
+    response.status(400).json({ error: "Invalid letter ID" });
+    return;
+  }
+
+  try {
+    const letter = await unclaimLetter(letterId, artistId);
+    response.status(200).json({
+      success: true,
+      message: "Letter released back to the mail board successfully",
+      letterId: letter?.id,
+    });
+  } catch (error: any) {
+    response.status(400).json({ error: error.message || "Failed to unclaim letter" });
   }
 };

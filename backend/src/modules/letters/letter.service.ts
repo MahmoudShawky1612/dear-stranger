@@ -1,5 +1,5 @@
-import {
-  claimLetter as claimLetterRepository,
+﻿import {
+  claimLetter as claimLetterRepository, unclaimLetter as unclaimLetterRepository,
   createLetter as createLetterRepository,
   findAvailableLetters,
   findSentLettersByUser,
@@ -130,4 +130,24 @@ export const getMyClaimedLetters = async (
       : null;
 
   return { letters, nextCursor };
+};
+export class LetterNotClaimedByUserError extends Error {
+  constructor() {
+    super("You can only unclaim a letter you have claimed");
+    this.name = "LetterNotClaimedByUserError";
+  }
+}
+
+export const unclaimLetter = async (letterId: number, artistId: number) => {
+  const existing = await findLetterById(letterId);
+  if (!existing) {
+    throw new LetterNotAvailableError();
+  }
+
+  if (existing.status !== "CLAIMED" || Number(existing.artistId) !== Number(artistId)) {
+    throw new LetterNotClaimedByUserError();
+  }
+
+  const result = await unclaimLetterRepository(letterId, artistId);
+  return result[0];
 };
