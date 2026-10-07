@@ -2,11 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'api_config.dart';
 import '../models/reply.dart';
 import '../models/user.dart';
 import '../models/json_parse.dart';
-
-const String kWsBaseUrl = 'ws://localhost:3000';
 
 /// Manages a WebSocket connection for real-time replies on a specific letter.
 ///

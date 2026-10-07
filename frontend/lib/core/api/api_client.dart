@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'api_config.dart';
 import 'http_client_factory.dart';
 import '../models/json_parse.dart';
 
-const String kBaseUrl = 'http://localhost:3000/api';
+export 'api_config.dart' show kBaseUrl;
 
 class ApiException implements Exception {
   final int statusCode;

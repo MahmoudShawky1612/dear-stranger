@@ -4,7 +4,7 @@ import app from "./app.js";
 import { createWebSocketServer } from "./lib/websocket.js";
 import { ensureBucketCors } from "./lib/b2.js";
 
-const PORT = 3000;
+const PORT = Number(process.env["PORT"]) || 3000;
 
 const server = http.createServer(app);
 
@@ -12,7 +12,6 @@ createWebSocketServer(server);
 
 ensureBucketCors().catch(console.error);
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Dear Stranger server is running on port ${PORT}`);
-  console.log(`WebSocket ready on ws://localhost:${PORT}`);
 });
