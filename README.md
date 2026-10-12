@@ -160,32 +160,6 @@ npm run build
 npm start
 ```
 
----
-
-## ⚙️ Environment Variables
-
-Create a `.env` file in the `backend/` directory:
-
-```env
-# PostgreSQL connection string
-DATABASE_URL=postgresql://user:password@host:5432/dear_stranger?sslmode=require
-
-# Backblaze B2 — Artwork bucket (private)
-B2_ENDPOINT=https://s3.us-east-005.backblazeb2.com
-B2_REGION=us-east-005
-B2_KEY_ID=your_key_id
-B2_APPLICATION_KEY=your_application_key
-B2_BUCKET_NAME=dear-stranger-artworks
-
-# Backblaze B2 — Avatar bucket (public)
-B2_AVATAR_BUCKET_NAME=dear-stranger-avatars
-B2_AVATAR_KEY_ID=your_avatar_key_id
-B2_AVATAR_APPLICATION_KEY=your_avatar_application_key
-B2_PUBLIC_URL=https://dear-stranger-avatars.s3.us-east-005.backblazeb2.com
-
-# Server port (optional, defaults to 3000)
-PORT=3000
-```
 
 ---
 
