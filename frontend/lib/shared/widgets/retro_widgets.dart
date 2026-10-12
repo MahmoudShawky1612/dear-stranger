@@ -1438,7 +1438,7 @@ class _Footer extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           const Text(
-            'Best experienced with Internet Explorer 6.0 or Netscape Navigator 7.0 at 1024×768 resolution.',
+            'No ka7k were eaten in the process of making this site.',
             style: TextStyle(
               fontFamily: 'Arial',
               fontSize: 9,
