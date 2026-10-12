@@ -45493,11 +45493,11 @@ break
 case 6:case 1:return A.A(q,r)
 case 2:return A.z(o.at(-1),r)}})
 return A.B($async$tq,r)},
-I(a){var s,r,q=this,p=null,o=t.p,n=A.b([A.b4(p,A.be(A.b([new A.aY(B.bT,15,p,p),B.an,B.H9,A.d2(p,!1,!1,!0,"Browse Mailboard >>",new A.amI(a))],o),B.q,B.l,B.m),B.o,B.x,p,p,p,p,B.c0,p),B.ei,B.Yr,B.dk],o)
+I(a){var s,r,q=this,p=null,o=t.p,n=A.b([A.b4(p,A.be(A.b([new A.aY(B.bT,15,p,p),B.an,B.H9,A.d2(p,!1,!1,!0,"Browse Mailboard >>",new A.amI(a))],o),B.q,B.l,B.m),B.o,B.x,p,p,p,p,B.c0,p),B.ei,B.Ys,B.dk],o)
 if(q.f)n.push(B.Q4)
 else{s=q.r
 if(s!=null)n.push(new A.lK(s,q.ga7K(),p))
-else if(J.e1(q.e))n.push(A.dI(A.bs(A.b([B.Yh,B.dm,A.d2(new A.aY(B.bE,13,p,p),!1,!0,!1,"Browse the Mailboard >>",new A.amJ(a))],o),B.q,B.l,B.m),B.cK,"No Active Claims",B.x))
+else if(J.e1(q.e))n.push(A.dI(A.bs(A.b([B.Yi,B.dm,A.d2(new A.aY(B.bE,13,p,p),!1,!0,!1,"Browse the Mailboard >>",new A.amJ(a))],o),B.q,B.l,B.m),B.cK,"No Active Claims",B.x))
 else{s=A.b4(p,B.Qb,B.o,p,p,B.nj,p,p,B.c0,p)
 r=A.cZ(B.aC,1)
 B.b.M(n,A.b([s,A.b4(p,A.aAf(new A.amK(q,a),J.c_(q.e),B.lA,!0),B.o,p,p,new A.bE(p,p,r,p,p,p,B.I),p,p,p,p)],o))}}return A.jh(A.bs(n,B.K,B.l,B.m),p,!1)}}
@@ -45589,7 +45589,7 @@ r.toString
 A.hK(r,!1,t.s6).Bg()}},
 I(a){var s,r,q,p,o,n,m=null,l=A.im(a,new A.ao0(),t.d,t.y),k=A.hK(a,!0,t.s6),j=t.p,i=A.b([new A.aY(B.bE,15,m,m),B.an,B.He],j)
 if(l)i.push(A.d2(new A.aY(B.cO,12,m,m),!1,!0,!0,"Write a Letter >>",new A.ao1(a)))
-i=A.b([A.b4(m,A.be(i,B.q,B.l,B.m),B.o,B.x,m,m,m,m,B.c0,m),B.ei,B.YE,B.dk],j)
+i=A.b([A.b4(m,A.be(i,B.q,B.l,B.m),B.o,B.x,m,m,m,m,B.c0,m),B.ei,B.YF,B.dk],j)
 if((k.c||!k.w)&&k.b.length===0)i.push(B.PU)
 else{s=k.e
 if(s!=null&&k.b.length===0)i.push(new A.lK(s,new A.ao2(k),m))
@@ -45886,20 +45886,20 @@ i=A.cZ(B.nW,1)
 i=A.b([s,B.aM,A.dI(A.bs(A.b([n,B.ej,k,B.dk,A.b4(g,A.aB(r.c,g,g,g,A.ayE().$1$color(B.n).zN(13,1.6),g,g),B.o,g,g,new A.bE(B.jQ,g,i,g,g,g,B.I),g,g,B.kn,1/0)],l),B.K,B.l,B.m),g,"The Letter",g),B.bt],l)
 if(m==="AVAILABLE"){s=A.b([],l)
 if(q)s.push(B.PR)
-else s.push(A.dI(A.bs(A.b([B.Yo,B.aM,h.Q?B.Q1:A.d2(new A.aY(B.bT,13,g,g),!1,!0,!1,"Claim This Letter to Illustrate >>",h.ga7J())],l),B.K,B.l,B.m),g,"Claim This Letter",B.x))
+else s.push(A.dI(A.bs(A.b([B.Yp,B.aM,h.Q?B.Q1:A.d2(new A.aY(B.bT,13,g,g),!1,!0,!1,"Claim This Letter to Illustrate >>",h.ga7J())],l),B.K,B.l,B.m),g,"Claim This Letter",B.x))
 B.b.M(i,s)}else if(m==="CLAIMED"&&p)B.b.M(i,A.b([A.dI(A.bs(A.b([B.XZ,B.aM,h.as?B.PT:A.d2(new A.aY(B.bT,13,g,g),!1,!0,!1,"Attach Artwork File >>",h.gakS())],l),B.K,B.l,B.m),g,"Attach Artwork",B.x)],l))
 else{s=r.Q
 if(s!=null){n=A.b([],l)
 s=s.r
 if(!s&&p){k=h.at?g:h.gahi()
-B.b.M(n,A.b([A.be(A.b([A.d2(new A.aY(B.ec,11,g,g),!1,!0,!0,"Publish to Public Gallery >>",k)],l),B.q,B.lr,B.m),B.cT],l))}if(s)n.push(A.be(A.b([A.b4(g,A.be(A.b([new A.aY(B.ec,10,g,g),B.b6,B.Yu],l),B.q,B.l,B.bC),B.o,B.k1,g,g,g,g,B.GX,g)],l),B.q,B.l,B.m))
+B.b.M(n,A.b([A.be(A.b([A.d2(new A.aY(B.ec,11,g,g),!1,!0,!0,"Publish to Public Gallery >>",k)],l),B.q,B.lr,B.m),B.cT],l))}if(s)n.push(A.be(A.b([A.b4(g,A.be(A.b([new A.aY(B.ec,10,g,g),B.b6,B.Yv],l),B.q,B.l,B.bC),B.o,B.k1,g,g,g,g,B.GX,g)],l),B.q,B.l,B.m))
 n.push(B.aM)
 if(h.x)n.push(B.PW)
 else{s=h.w
 if(s!=null){k=A.cZ(B.aC,1)
-n.push(A.b4(g,A.pF(s,new A.aqn(),B.nk),B.o,g,g,new A.bE(g,g,k,g,g,g,B.I),g,g,g,g))}else n.push(B.YG)}B.b.M(i,A.b([A.dI(A.bs(n,B.K,B.l,B.m),g,"Original Artwork",g)],l))}}if(m==="DELIVERED"){s=A.b([],l)
+n.push(A.b4(g,A.pF(s,new A.aqn(),B.nk),B.o,g,g,new A.bE(g,g,k,g,g,g,B.I),g,g,g,g))}else n.push(B.YH)}B.b.M(i,A.b([A.dI(A.bs(n,B.K,B.l,B.m),g,"Original Artwork",g)],l))}}if(m==="DELIVERED"){s=A.b([],l)
 n=r.as
-if(n.length===0)s.push(B.Yb)
+if(n.length===0)s.push(B.Yc)
 else B.b.M(s,new A.AW(n,A.X(n).i("AW<1>")).gfk().hZ(0,new A.aqo(f,q,r,o),t.l7))
 if(q||p){n=A.cK(A.QK(g,B.cM,!1,g,!0,B.O,g,A.ayN(),h.y,g,g,g,g,g,2,B.HZ,B.A,!0,g,!0,g,!1,g,B.cd,g,g,g,g,g,g,g,g,3,g,g,!1,"\u2022",g,g,g,g,g,!1,g,g,!1,g,!0,g,B.c1,g,g,g,g,g,g,g,g,g,g,g,B.ep,!0,B.aF,g,B.em,g,g,g,g),1)
 B.b.M(s,A.b([B.PS,A.be(A.b([n,B.an,h.z?B.lL:A.d2(new A.aY(B.P_,12,g,g),!1,!0,!1,"Send Reply >>",h.gaiE())],l),B.dH,B.l,B.m)],l))}B.b.M(i,A.b([B.bt,A.dI(A.bs(s,B.K,B.l,B.m),g,"Correspondence & Messages",g)],l))}return A.jh(A.bs(i,B.K,B.l,B.m),g,!1)}}
@@ -46087,7 +46087,7 @@ I(a){var s,r,q=this,p=null,o=t.p,n=A.b([A.b4(p,A.be(A.b([new A.aY(B.bE,15,p,p),B
 if(q.f)n.push(B.Q3)
 else{s=q.r
 if(s!=null)n.push(new A.lK(s,q.gafk(),p))
-else if(J.e1(q.e))n.push(A.dI(A.bs(A.b([B.YD,B.dm,A.d2(new A.aY(B.cO,13,p,p),!1,!0,!1,"Write Your First Letter >>",new A.ar7(a))],o),B.q,B.l,B.m),B.cK,"No Sent Letters",B.x))
+else if(J.e1(q.e))n.push(A.dI(A.bs(A.b([B.YE,B.dm,A.d2(new A.aY(B.cO,13,p,p),!1,!0,!1,"Write Your First Letter >>",new A.ar7(a))],o),B.q,B.l,B.m),B.cK,"No Sent Letters",B.x))
 else{s=A.b4(p,B.Qa,B.o,p,p,B.nj,p,p,B.c0,p)
 r=A.cZ(B.aC,1)
 B.b.M(n,A.b([s,A.b4(p,A.aAf(new A.ar8(q,a),J.c_(q.e),B.lA,!0),B.o,p,p,new A.bE(p,p,r,p,p,p,B.I),p,p,p,p)],o))}}return A.jh(A.bs(n,B.K,B.l,B.m),p,!1)}}
@@ -46202,17 +46202,17 @@ break
 case 6:case 1:return A.A(q,r)
 case 2:return A.z(o.at(-1),r)}})
 return A.B($async$yC,r)},
-I(a){var s,r=this,q=null,p=t.p,o=A.b4(q,A.be(A.b([new A.aY(B.cO,15,q,q),B.an,B.Yt],p),B.q,B.l,B.m),B.o,B.x,q,q,q,q,B.c0,1/0),n=A.b([],p),m=r.x
+I(a){var s,r=this,q=null,p=t.p,o=A.b4(q,A.be(A.b([new A.aY(B.cO,15,q,q),B.an,B.Yu],p),B.q,B.l,B.m),B.o,B.x,q,q,q,q,B.c0,1/0),n=A.b([],p),m=r.x
 if(m!=null){s=A.cZ(B.bz,1)
 B.b.M(n,A.b([A.b4(q,A.aB("Error: "+m,q,q,q,B.iX,q,q),B.o,q,q,new A.bE(B.ho,q,s,q,q,q,B.I),q,q,B.bO,q),B.bt],p))}n.push(A.ji(r.e,"Give your letter a title...",q,"Letter Title / Subject:",1,!1,new A.aum()))
 n.push(B.fK)
 n.push(A.ji(r.f,"Write something heartfelt, curious, or honest...",q,"Letter Body:",12,!1,new A.aun()))
 n.push(B.aM)
 m=A.cZ(B.Fa,1)
-n.push(A.b4(q,A.be(A.b([new A.yR(r.r,new A.auo(r),q),A.cx(q,B.Yj,B.A,!1,q,q,q,q,q,q,q,q,q,q,q,q,q,q,new A.aup(r),q,q,q,q,q,q)],p),B.q,B.l,B.m),B.o,q,q,new A.bE(B.Fz,q,m,q,q,q,B.I),q,q,B.hC,q))
+n.push(A.b4(q,A.be(A.b([new A.yR(r.r,new A.auo(r),q),A.cx(q,B.Yk,B.A,!1,q,q,q,q,q,q,q,q,q,q,q,q,q,q,new A.aup(r),q,q,q,q,q,q)],p),B.q,B.l,B.m),B.o,q,q,new A.bE(B.Fz,q,m,q,q,q,B.I),q,q,B.hC,q))
 n.push(B.dm)
 n.push(r.w?B.PV:A.be(A.b([A.cK(A.d2(new A.aY(B.bE,13,q,q),!1,!0,!1,"Post Letter to Board >>",r.gaiG()),1),B.iQ,A.d2(q,!1,!1,!1,"Cancel",new A.auq(a))],p),B.q,B.l,B.m))
-return A.jh(new A.d7(B.CJ,A.bs(A.b([o,B.ej,B.Y7,B.dk,A.dI(A.azT(A.bs(n,B.bN,B.l,B.m),r.d),q,q,q)],p),B.K,B.l,B.m),q),q,!1)}}
+return A.jh(new A.d7(B.CJ,A.bs(A.b([o,B.ej,B.Y8,B.dk,A.dI(A.azT(A.bs(n,B.bN,B.l,B.m),r.d),q,q,q)],p),B.K,B.l,B.m),q),q,!1)}}
 A.aui.prototype={
 $0(){var s=this.a
 s.w=!0
@@ -46482,7 +46482,7 @@ j=j!=null&&B.c.bP(j).length!==0?A.pF(j,new A.as6(),B.dB):A.d6(new A.aY(B.aW,18,r
 k=A.b4(r,j,B.bp,r,r,new A.bE(B.dG,r,k,r,r,r,B.I),32,r,r,32)
 j=t.p
 o=A.b([A.cx(r,A.aB(o.giv(),r,r,r,B.B2,r,r),B.A,!1,r,r,r,r,r,r,r,r,r,r,r,r,r,r,new A.as7(s.d,p),r,r,r,r,r,r),B.fM,A.aB(s.e.jc(p.c),r,r,r,B.cx,r,r)],j)
-if(n)B.b.M(o,A.b([B.an,A.cx(r,B.Yy,B.A,!1,r,r,r,r,r,r,r,r,r,r,r,r,r,r,new A.as8(q,p),r,r,r,r,r,r)],j))
+if(n)B.b.M(o,A.b([B.an,A.cx(r,B.Yz,B.A,!1,r,r,r,r,r,r,r,r,r,r,r,r,r,r,new A.as8(q,p),r,r,r,r,r,r)],j))
 return A.b4(r,A.be(A.b([k,B.iQ,A.cK(A.bs(A.b([A.be(o,B.q,B.l,B.m),B.ei,A.aB(p.b,r,r,r,A.ayE().$1$color(B.n).zN(12,1.45),r,r)],j),B.K,B.l,B.m),1)],j),B.K,B.l,B.m),B.o,r,r,new A.bE(m,r,l,r,r,r,B.I),r,r,B.oy,r)},
 $S:439}
 A.as6.prototype={
@@ -46659,7 +46659,7 @@ break
 case 6:case 1:return A.A(q,r)
 case 2:return A.z(o.at(-1),r)}})
 return A.B($async$yp,r)},
-I(a){var s,r,q,p,o=this,n=null,m=A.im(a,new A.auF(),t.d,t.z),l=t.p,k=A.b([A.cK(A.b4(n,A.be(A.b([new A.aY(B.aW,15,B.j,n),B.an,B.Ye],l),B.q,B.l,B.m),B.o,B.x,n,n,n,n,B.c0,n),1)],l),j=m==null
+I(a){var s,r,q,p,o=this,n=null,m=A.im(a,new A.auF(),t.d,t.z),l=t.p,k=A.b([A.cK(A.b4(n,A.be(A.b([new A.aY(B.aW,15,B.j,n),B.an,B.Yf],l),B.q,B.l,B.m),B.o,B.x,n,n,n,n,B.c0,n),1)],l),j=m==null
 if(!j)B.b.M(k,A.b([B.an,A.d2(n,!1,!1,!0,"View Public Profile >>",new A.auG(a,m))],l))
 k=A.b([A.be(k,B.q,B.l,B.m),B.bt],l)
 s=o.as
@@ -46673,7 +46673,7 @@ r=A.pF(r,new A.auH(),B.dB)}else r=B.Bl
 s=A.b4(n,r,B.o,n,n,new A.bE(B.bM,n,s,n,n,n,B.I),90,n,n,90)
 r=A.b([o.z?B.lL:A.d2(new A.aY(B.il,11,n,n),!1,!1,!0,"Upload New Photo >>",o.gakT())],l)
 if((j?n:m.guv())!=null)r.push(A.d2(n,!0,!1,!0,"Remove Photo",o.gahC()))
-k.push(A.dI(A.be(A.b([s,B.Av,A.cK(A.bs(A.b([B.Yi,B.aM,A.Ey(B.cf,r,8,8)],l),B.K,B.l,B.m),1)],l),B.q,B.l,B.m),n,"Profile Picture",B.x))
+k.push(A.dI(A.be(A.b([s,B.Av,A.cK(A.bs(A.b([B.Yj,B.aM,A.Ey(B.cf,r,8,8)],l),B.K,B.l,B.m),1)],l),B.q,B.l,B.m),n,"Profile Picture",B.x))
 k.push(B.bt)
 j=A.ji(o.e,"Your name or alias",n,"Display Name / Nickname:",1,!1,n)
 s=A.ji(o.f,"Tell everyone about yourself...",n,"About Me (Bio):",4,!1,n)
@@ -46892,7 +46892,7 @@ if(q!=null)r.push(A.aB(q,p,p,p,B.cx,p,p))
 l=l.w
 if(l!=null)r.push(A.aB(l,p,p,p,B.cx,p,p))
 s.push(A.Ey(B.cf,r,0,10))
-return A.cx(p,A.dw(A.b4(p,A.be(A.b([m,B.Au,A.cK(A.bs(s,B.K,B.l,B.m),1),B.Ya],k),B.K,B.l,B.m),B.o,p,p,new A.bE(o,p,n,p,p,p,B.I),p,p,B.km,p),B.ao,p,p,p,p),B.A,!1,p,p,p,p,p,p,p,p,p,p,p,p,p,p,new A.awl(this,a),p,p,p,p,p,p)}}
+return A.cx(p,A.dw(A.b4(p,A.be(A.b([m,B.Au,A.cK(A.bs(s,B.K,B.l,B.m),1),B.Yb],k),B.K,B.l,B.m),B.o,p,p,new A.bE(o,p,n,p,p,p,B.I),p,p,B.km,p),B.ao,p,p,p,p),B.A,!1,p,p,p,p,p,p,p,p,p,p,p,p,p,p,new A.awl(this,a),p,p,p,p,p,p)}}
 A.awl.prototype={
 $0(){return A.cb(this.b).c1("/profile/"+this.a.c.b,null)},
 $S:0}
@@ -47037,7 +47037,7 @@ break}f.restore()},
 eJ(a){return a.b!==this.b||!J.d(a.c,this.c)}}
 A.NA.prototype={
 I(a){var s=null
-return A.b4(s,B.Y9,B.o,s,s,new A.bE(B.eW,s,A.cZ(B.Fx,1),s,s,s,B.I),s,s,B.GU,s)}}
+return A.b4(s,B.Ya,B.o,s,s,new A.bE(B.eW,s,A.cZ(B.Fx,1),s,s,s,B.I),s,s,B.GU,s)}}
 A.Ct.prototype={
 ab(){return new A.Xg()}}
 A.Xg.prototype={
@@ -47224,7 +47224,7 @@ s.toString
 r=A.kD(1,q,B.U,!0)
 A.cb(s).c1("/search?q="+r,null)},
 I(a){var s=null
-return A.e9(A.be(A.b([A.cK(A.QK(s,B.cM,!1,s,!0,B.O,s,A.ayN(),this.d,B.x,s,s,s,s,2,B.I_,B.A,!0,s,!0,s,!1,s,B.cd,s,s,s,s,s,s,s,s,1,s,s,!1,"\u2022",s,s,s,new A.aoU(this),s,!1,s,s,!1,s,!0,s,B.c1,s,s,s,s,s,s,s,s,s,s,s,B.UM,!0,B.aF,s,B.em,s,B.mn,s,s),1),B.b6,A.cx(s,A.dw(A.b4(B.a8,B.Y8,B.o,B.eW,s,s,26,s,B.kp,s),B.ao,s,s,s,s),B.A,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,this.gaaI(),s,s,s,s,s,s)],t.p),B.q,B.l,B.m),26,s)}}
+return A.e9(A.be(A.b([A.cK(A.QK(s,B.cM,!1,s,!0,B.O,s,A.ayN(),this.d,B.x,s,s,s,s,2,B.I_,B.A,!0,s,!0,s,!1,s,B.cd,s,s,s,s,s,s,s,s,1,s,s,!1,"\u2022",s,s,s,new A.aoU(this),s,!1,s,s,!1,s,!0,s,B.c1,s,s,s,s,s,s,s,s,s,s,s,B.UM,!0,B.aF,s,B.em,s,B.mn,s,s),1),B.b6,A.cx(s,A.dw(A.b4(B.a8,B.Y9,B.o,B.eW,s,s,26,s,B.kp,s),B.ao,s,s,s,s),B.A,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,this.gaaI(),s,s,s,s,s,s)],t.p),B.q,B.l,B.m),26,s)}}
 A.aoU.prototype={
 $1(a){return this.a.Qn()},
 $S:51}
@@ -47241,7 +47241,7 @@ $S:0}
 A.rT.prototype={
 ab(){return new A.Vu()}}
 A.Vu.prototype={
-I(a){var s=null,r=A.hK(a,!0,t.yu),q=t.p,p=A.b4(s,A.be(A.b([new A.aY(B.bE,14,s,s),B.iR,B.Yn,B.fM,A.cx(s,B.B3,B.A,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,new A.arl(a),s,s,s,s,s,s)],q),B.q,B.l,B.m),B.o,B.x,s,s,s,s,B.f5,1/0),o=t.JA
+I(a){var s=null,r=A.hK(a,!0,t.yu),q=t.p,p=A.b4(s,A.be(A.b([new A.aY(B.bE,14,s,s),B.iR,B.Yo,B.fM,A.cx(s,B.B3,B.A,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,new A.arl(a),s,s,s,s,s,s)],q),B.q,B.l,B.m),B.o,B.x,s,s,s,s,B.f5,1/0),o=t.JA
 return A.aE7(B.y,new A.d7(B.CB,A.bs(A.b([p,A.b4(s,A.pX(r.b,o).length===0?new A.bX(B.cK,A.aB("No new mail. Check back later!",s,s,s,B.j0.bS(B.ax),B.aY,s),s):new A.d7(B.CK,A.aAf(new A.arm(r),A.pX(r.b,o).length,s,!0),s),B.o,B.j,s,s,s,s,s,s),A.b4(s,A.be(A.b([A.aB(""+r.c+" unread",s,s,s,B.mq.bS(B.ax),s,s),A.cx(s,A.aB(">> Close",s,s,s,B.Xm,s,s),B.A,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,new A.arn(a),s,s,s,s,s,s)],q),B.q,B.vw,B.m),B.o,B.bM,s,s,s,s,B.c0,1/0)],q),B.q,B.l,B.bC),s),B.cK)}}
 A.arl.prototype={
 $0(){return A.np(this.a,!1).dU()},
@@ -47319,7 +47319,7 @@ return A.cb(this.b).c1(s,null)},
 $S:0}
 A.U3.prototype={
 I(a){var s=null,r=t.p
-return A.b4(s,A.bs(A.b([A.Ey(B.Bk,A.b([new A.kv("About Us",s),B.h_,new A.kv("FAQ",s),B.h_,new A.kv("Terms of Service",s),B.h_,new A.kv("Privacy Policy",s),B.h_,new A.kv("Safety Tips",s),B.h_,new A.kv("Contact",s)],r),0,0),B.Sb,A.aB("\xa9 2004-2008 Dear Stranger. All Rights Reserved.",s,s,s,B.Wd,B.aY,s),B.Ax,B.YH],r),B.q,B.l,B.m),B.o,B.EZ,s,s,s,s,B.GO,1/0)}}
+return A.b4(s,A.bs(A.b([A.Ey(B.Bk,A.b([new A.kv("About Us",s),B.h_,new A.kv("FAQ",s),B.h_,new A.kv("Terms of Service",s),B.h_,new A.kv("Privacy Policy",s),B.h_,new A.kv("Safety Tips",s),B.h_,new A.kv("Contact",s)],r),0,0),B.Sb,A.aB("\xa9 2004-2008 Dear Stranger. All Rights Reserved.",s,s,s,B.Wd,B.aY,s),B.Ax,B.Y5],r),B.q,B.l,B.m),B.o,B.EZ,s,s,s,s,B.GO,1/0)}}
 A.U5.prototype={
 I(a){return B.Oh}}
 A.kv.prototype={
@@ -89658,7 +89658,7 @@ A.Xu.prototype={}
 A.uf.prototype={
 I(a){var s=null,r=this.c
 r=r==null?s:"GoException: "+r.a
-return A.Pg(!0,A.d6(A.bs(A.b([B.Yp,B.dm,A.aB(r==null?"page not found":r,s,s,s,s,s,s),B.dm,new A.EM(new A.a5r(a),B.Yg,s)],t.p),B.q,B.ft,B.m),s,s),!0)}}
+return A.Pg(!0,A.d6(A.bs(A.b([B.Yq,B.dm,A.aB(r==null?"page not found":r,s,s,s,s,s,s),B.dm,new A.EM(new A.a5r(a),B.Yh,s)],t.p),B.q,B.ft,B.m),s,s),!0)}}
 A.a5r.prototype={
 $0(){return A.cb(this.a).c1("/",null)},
 $S:0}
@@ -89708,7 +89708,7 @@ A.uP.prototype={
 I(a){var s=null,r=this.c
 r=r==null?s:"GoException: "+r.a
 if(r==null)r="page not found"
-return A.aga(new A.yp(B.Y1,new A.Wo(s,s,1/0,56),s),s,A.d6(A.bs(A.b([new A.CS(r,s),A.aAT(B.Yw,new A.abP(a),s)],t.p),B.q,B.ft,B.m),s,s))}}
+return A.aga(new A.yp(B.Y1,new A.Wo(s,s,1/0,56),s),s,A.d6(A.bs(A.b([new A.CS(r,s),A.aAT(B.Yx,new A.abP(a),s)],t.p),B.q,B.ft,B.m),s,s))}}
 A.abP.prototype={
 $0(){return A.cb(this.a).c1("/",null)},
 $S:0}
@@ -95812,13 +95812,13 @@ B.L=new A.f_(700)
 B.cc=new A.k(!0,B.j,null,"Arial",null,null,12,B.L,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.YI=new A.aZ("My Claims \u2014 Letters You Are Illustrating",null,B.cc,null,null,null,null,null,null)
 B.H9=new A.hu(1,B.bP,B.YI,null)
-B.Yl=new A.aZ("My Sent Mail \u2014 Letters You Have Posted",null,B.cc,null,null,null,null,null,null)
-B.Ha=new A.hu(1,B.bP,B.Yl,null)
+B.Ym=new A.aZ("My Sent Mail \u2014 Letters You Have Posted",null,B.cc,null,null,null,null,null,null)
+B.Ha=new A.hu(1,B.bP,B.Ym,null)
 B.j_=new A.k(!0,null,null,"Arial",null,null,12,null,null,null,null,null,1.4,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Yz=new A.aZ("Members can leave a letter in this guestbook. Create an account or sign in first.",null,B.j_,null,null,null,null,null,null)
-B.Hb=new A.hu(1,B.bP,B.Yz,null)
-B.YB=new A.aZ("Member Search \u2014 Find a Stranger by Username",null,B.cc,null,null,null,null,null,null)
-B.Hd=new A.hu(1,B.bP,B.YB,null)
+B.YA=new A.aZ("Members can leave a letter in this guestbook. Create an account or sign in first.",null,B.j_,null,null,null,null,null,null)
+B.Hb=new A.hu(1,B.bP,B.YA,null)
+B.YC=new A.aZ("Member Search \u2014 Find a Stranger by Username",null,B.cc,null,null,null,null,null,null)
+B.Hd=new A.hu(1,B.bP,B.YC,null)
 B.XV=new A.aZ("The Mail Board \u2014 Recent Letters Awaiting Artists",null,B.cc,null,null,null,null,null,null)
 B.He=new A.hu(1,B.bP,B.XV,null)
 B.Hg=new A.zU(null,null,null,null,null,null,null,null,null,null,null,null,null)
@@ -97121,18 +97121,18 @@ B.VG=new A.k(!0,B.ax,null,"Arial",null,null,10,null,null,null,null,null,null,nul
 B.YK=new A.aZ("\u203a Return to Mailboard",null,B.VG,B.aY,null,null,null,null,null)
 B.MG=new A.ja(null,null,null,B.ao,B.YK,null)
 B.mr=new A.k(!0,B.x,null,"Arial",null,null,11,null,null,null,null,null,null,null,null,null,null,B.az,null,null,null,null,null,null,null,null)
-B.Ym=new A.aZ("\u203a Browse the Mailboard as Guest",null,B.mr,B.aY,null,null,null,null,null)
-B.MH=new A.ja(null,null,null,B.ao,B.Ym,null)
-B.Yd=new A.aZ("\xab Back to Mail Board",null,B.mr,null,null,null,null,null,null)
-B.MI=new A.ja(null,null,null,B.ao,B.Yd,null)
+B.Yn=new A.aZ("\u203a Browse the Mailboard as Guest",null,B.mr,B.aY,null,null,null,null,null)
+B.MH=new A.ja(null,null,null,B.ao,B.Yn,null)
+B.Ye=new A.aZ("\xab Back to Mail Board",null,B.mr,null,null,null,null,null,null)
+B.MI=new A.ja(null,null,null,B.ao,B.Ye,null)
 B.UK=new A.k(!0,B.cn,null,"Arial",null,null,11,B.L,null,null,null,null,null,null,null,null,null,B.az,B.cn,null,null,null,null,null,null,null)
-B.Yx=new A.aZ("Sign Up",null,B.UK,null,null,null,null,null,null)
-B.MJ=new A.ja(null,null,null,B.ao,B.Yx,null)
-B.YC=new A.aZ("\u203a Already have an account? Click here to Login",null,B.mr,B.aY,null,null,null,null,null)
-B.MK=new A.ja(null,null,null,B.ao,B.YC,null)
+B.Yy=new A.aZ("Sign Up",null,B.UK,null,null,null,null,null,null)
+B.MJ=new A.ja(null,null,null,B.ao,B.Yy,null)
+B.YD=new A.aZ("\u203a Already have an account? Click here to Login",null,B.mr,B.aY,null,null,null,null,null)
+B.MK=new A.ja(null,null,null,B.ao,B.YD,null)
 B.Wv=new A.k(!0,B.j,null,"Arial",null,null,11,B.L,null,null,null,null,null,null,null,null,null,B.az,B.j,null,null,null,null,null,null,null)
-B.Y5=new A.aZ("Sign In",null,B.Wv,null,null,null,null,null,null)
-B.ML=new A.ja(null,null,null,B.ao,B.Y5,null)
+B.Y6=new A.aZ("Sign In",null,B.Wv,null,null,null,null,null,null)
+B.ML=new A.ja(null,null,null,B.ao,B.Y6,null)
 B.e4=new A.Nu(0,"latestPointer")
 B.ly=new A.Nu(1,"averageBoundaryPointers")
 B.vL=new A.qb(0,"clipRect")
@@ -97228,15 +97228,15 @@ B.Of=new A.NS(0,"nearestOverlay")
 B.Og=new A.NS(1,"rootOverlay")
 B.EG=new A.u(1,0.3333333333333333,0.4666666666666667,0.6666666666666666,B.e)
 B.Uy=new A.k(!0,B.EG,null,"Arial",null,null,10,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Yk=new A.aZ("|",null,B.Uy,null,null,null,null,null,null)
-B.Oh=new A.bX(B.ko,B.Yk,null)
-B.Yf=new A.aZ("[ Image could not be loaded ]",null,B.fQ,null,null,null,null,null,null)
-B.vZ=new A.bX(B.oB,B.Yf,null)
+B.Yl=new A.aZ("|",null,B.Uy,null,null,null,null,null,null)
+B.Oh=new A.bX(B.ko,B.Yl,null)
+B.Yg=new A.aZ("[ Image could not be loaded ]",null,B.fQ,null,null,null,null,null,null)
+B.vZ=new A.bX(B.oB,B.Yg,null)
 B.Gi=new A.zw(1,null)
 B.Oi=new A.bX(B.ox,B.Gi,null)
 B.Vf=new A.k(!0,B.nK,null,"Arial",null,null,11,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Yc=new A.aZ("|",null,B.Vf,null,null,null,null,null,null)
-B.Oj=new A.bX(B.ko,B.Yc,null)
+B.Yd=new A.aZ("|",null,B.Vf,null,null,null,null,null,null)
+B.Oj=new A.bX(B.ko,B.Yd,null)
 B.br=new A.NX(0,"fill")
 B.bD=new A.NX(1,"stroke")
 B.Ok=new A.nt(1/0)
@@ -97326,8 +97326,8 @@ B.PP=new A.vm(3,"unstable")
 B.ct=new A.C6(0,"identical")
 B.PQ=new A.C6(2,"paint")
 B.bi=new A.C6(3,"layout")
-B.YA=new A.aZ("Your letter is currently waiting on the mailboard. When an artist claims it, you will receive a notification in your mailbox.",null,B.j_,null,null,null,null,null,null)
-B.PR=new A.Cu(B.YA,"Letter Status: Waiting on Mailboard",B.hl,null,null)
+B.YB=new A.aZ("Your letter is currently waiting on the mailboard. When an artist claims it, you will receive a notification in your mailbox.",null,B.j_,null,null,null,null,null,null)
+B.PR=new A.Cu(B.YB,"Letter Status: Waiting on Mailboard",B.hl,null,null)
 B.PS=new A.Cv("SEND A MESSAGE",null)
 B.dk=new A.Cv(null,null)
 B.PT=new A.eq("Uploading artwork",null)
@@ -97364,16 +97364,16 @@ B.Y0=new A.aZ("STATUS",null,B.eo,null,null,null,null,null,null)
 B.Az=new A.cG(90,null,B.Y0,null)
 B.YJ=new A.aZ("LETTER TITLE",null,B.eo,null,null,null,null,null,null)
 B.oL=new A.hu(3,B.bP,B.YJ,null)
-B.Ys=new A.aZ("ARTIST",null,B.eo,null,null,null,null,null,null)
-B.Hc=new A.hu(2,B.bP,B.Ys,null)
+B.Yt=new A.aZ("ARTIST",null,B.eo,null,null,null,null,null,null)
+B.Hc=new A.hu(2,B.bP,B.Yt,null)
 B.XW=new A.aZ("DATE",null,B.eo,null,null,null,null,null,null)
 B.Ay=new A.cG(80,null,B.XW,null)
 B.Jj=s([B.Az,B.oL,B.Hc,B.Ay],t.p)
 B.Qa=new A.vv(B.au,B.l,B.m,B.q,null,B.dv,null,0,B.Jj,null)
 B.XY=new A.aZ("AUTHOR",null,B.eo,null,null,null,null,null,null)
 B.Hf=new A.hu(2,B.bP,B.XY,null)
-B.YF=new A.aZ("ACTION",null,B.eo,B.dn,null,null,null,null,null)
-B.Sa=new A.cG(100,null,B.YF,null)
+B.YG=new A.aZ("ACTION",null,B.eo,B.dn,null,null,null,null,null)
+B.Sa=new A.cG(100,null,B.YG,null)
 B.Jo=s([B.Az,B.oL,B.Hf,B.Ay,B.Sa],t.p)
 B.Qb=new A.vv(B.au,B.l,B.m,B.q,null,B.dv,null,0,B.Jo,null)
 B.Qc=new A.Ph(null,null)
@@ -97624,14 +97624,14 @@ B.Si=new A.km(3,"hide")
 B.a1d=new A.km(4,"remove")
 B.Sj=new A.km(5,"timeout")
 B.Sk=new A.vN(null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Y6=new A.aZ("\ud83c\udf0d Artwork shared with everyone!",null,null,null,null,null,null,null,null)
-B.Sl=new A.kl(B.Y6,null,null,null,null,null,null,null,null,null,null,null,null,B.cp,!1,null,null,null,B.O,null)
-B.Yv=new A.aZ(u.v,null,null,null,null,null,null,null,null)
-B.Sm=new A.kl(B.Yv,null,null,null,null,null,null,null,null,null,null,null,null,B.cp,!1,null,null,null,B.O,null)
+B.Y7=new A.aZ("\ud83c\udf0d Artwork shared with everyone!",null,null,null,null,null,null,null,null)
+B.Sl=new A.kl(B.Y7,null,null,null,null,null,null,null,null,null,null,null,null,B.cp,!1,null,null,null,B.O,null)
+B.Yw=new A.aZ(u.v,null,null,null,null,null,null,null,null)
+B.Sm=new A.kl(B.Yw,null,null,null,null,null,null,null,null,null,null,null,null,B.cp,!1,null,null,null,B.O,null)
 B.XU=new A.aZ("Your letter has been posted to the mailboard!",null,null,null,null,null,null,null,null)
 B.Sn=new A.kl(B.XU,null,null,null,null,null,null,null,null,null,null,null,null,B.cp,!1,null,null,null,B.O,null)
-B.Yq=new A.aZ("\ud83c\udfa8 Artwork delivered!",null,null,null,null,null,null,null,null)
-B.So=new A.kl(B.Yq,null,null,null,null,null,null,null,null,null,null,null,null,B.cp,!1,null,null,null,B.O,null)
+B.Yr=new A.aZ("\ud83c\udfa8 Artwork delivered!",null,null,null,null,null,null,null,null)
+B.So=new A.kl(B.Yr,null,null,null,null,null,null,null,null,null,null,null,null,B.cp,!1,null,null,null,B.O,null)
 B.AC=new A.Di(0,"permissive")
 B.Sp=new A.Di(1,"normal")
 B.Sq=new A.Di(2,"forced")
@@ -98032,39 +98032,39 @@ B.B_=new A.k(!0,B.aC,null,"Arial",null,null,10,null,B.cL,null,null,null,null,nul
 B.Y2=new A.aZ("free registration \xb7 join in 30 seconds",null,B.B_,null,null,null,null,null,null)
 B.WJ=new A.k(!0,B.x,null,"Arial",null,null,12,B.L,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.Y3=new A.aZ("\u203a ",null,B.WJ,null,null,null,null,null,null)
-B.B3=new A.aZ("[X]",null,B.ms,null,null,null,null,null,null)
-B.Y7=new A.aZ("Your letter will appear on the public mailboard. An artist will pick it up and create original artwork inspired by your words.",null,B.fR,null,null,null,null,null,null)
-B.Y8=new A.aZ("Go",null,B.ms,null,null,null,null,null,null)
-B.Vm=new A.k(!0,B.j,null,"Arial",null,null,9,B.L,null,0.5,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Y9=new A.aZ("NEW!",null,B.Vm,null,null,null,null,null,null)
-B.WO=new A.k(!0,B.eW,null,"Arial",null,null,11,B.L,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Ya=new A.aZ("View Space >>",null,B.WO,null,null,null,null,null,null)
-B.Yb=new A.aZ("No messages yet. Send a response to the artist!",null,B.iY,null,null,null,null,null,null)
-B.Ye=new A.aZ("Edit Profile & Settings",null,B.cc,null,null,null,null,null,null)
-B.Uu=new A.k(!0,B.j,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Yg=new A.aZ("Go to home page",null,B.Uu,null,null,null,null,null,null)
-B.Yh=new A.aZ("You haven't claimed any letters to illustrate yet.\nVisit the mailboard to pick up a letter and start painting!",null,B.iZ,B.aY,null,null,null,null,null)
-B.Yi=new A.aZ("Upload a JPG, PNG, or WebP image (max 2 MB). This will appear on your profile and guestbook entries.",null,B.fQ,null,null,null,null,null,null)
-B.B4=new A.aZ("a place for letters & hand-drawn art",null,B.B_,null,null,null,null,null,null)
-B.Uv=new A.k(!0,null,null,"Arial",null,null,11,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Yj=new A.aZ("Post anonymously (hide my username from the artist)",null,B.Uv,null,null,null,null,null,null)
-B.Yn=new A.aZ("Your Mailbox",null,B.cc,null,null,null,null,null,null)
-B.Yo=new A.aZ("Are you inspired by this letter? Pick it up to create an illustration for this stranger!",null,B.ep,null,null,null,null,null,null)
-B.Yp=new A.aZ("Page Not Found",null,B.iW,null,null,null,null,null,null)
-B.Yr=new A.aZ("Letters you have picked up to illustrate. Upload artwork to deliver your response.",null,B.fR,null,null,null,null,null,null)
-B.Yt=new A.aZ("Drop a Letter into the Mail Box",null,B.cc,null,null,null,null,null,null)
-B.Yu=new A.aZ("PUBLISHED TO PUBLIC GALLERY",null,B.AZ,null,null,null,null,null,null)
-B.Wb=new A.k(!0,B.dG,null,"Arial",null,null,16,B.L,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.mv=new A.aZ(".com",null,B.Wb,null,null,null,null,null,null)
-B.Yw=new A.aZ("Home",null,null,null,null,null,null,null,null)
-B.W0=new A.k(!0,B.bz,null,"Arial",null,null,10,null,null,null,null,null,null,null,null,null,null,B.az,null,null,null,null,null,null,null,null)
-B.Yy=new A.aZ("[delete]",null,B.W0,null,null,null,null,null,null)
-B.YD=new A.aZ("You haven't posted any letters yet.\nDrop a letter on the mailboard and an artist will illustrate it for you!",null,B.iZ,B.aY,null,null,null,null,null)
-B.YE=new A.aZ("Browse open letters from strangers. Claim one to illustrate and return original art.",null,B.fR,null,null,null,null,null,null)
-B.YG=new A.aZ("Artwork uploaded. Loading preview...",null,B.ep,null,null,null,null,null,null)
 B.Fo=new A.u(1,0.4,0.5333333333333333,0.6666666666666666,B.e)
 B.TC=new A.k(!0,B.Fo,null,"Arial",null,null,9,null,B.cL,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.YH=new A.aZ("Best experienced with Internet Explorer 6.0 or Netscape Navigator 7.0 at 1024\xd7768 resolution.",null,B.TC,B.aY,null,null,null,null,null)
+B.Y5=new A.aZ("No ka7k were eaten in the process of making this site.",null,B.TC,B.aY,null,null,null,null,null)
+B.B3=new A.aZ("[X]",null,B.ms,null,null,null,null,null,null)
+B.Y8=new A.aZ("Your letter will appear on the public mailboard. An artist will pick it up and create original artwork inspired by your words.",null,B.fR,null,null,null,null,null,null)
+B.Y9=new A.aZ("Go",null,B.ms,null,null,null,null,null,null)
+B.Vm=new A.k(!0,B.j,null,"Arial",null,null,9,B.L,null,0.5,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.Ya=new A.aZ("NEW!",null,B.Vm,null,null,null,null,null,null)
+B.WO=new A.k(!0,B.eW,null,"Arial",null,null,11,B.L,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.Yb=new A.aZ("View Space >>",null,B.WO,null,null,null,null,null,null)
+B.Yc=new A.aZ("No messages yet. Send a response to the artist!",null,B.iY,null,null,null,null,null,null)
+B.Yf=new A.aZ("Edit Profile & Settings",null,B.cc,null,null,null,null,null,null)
+B.Uu=new A.k(!0,B.j,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.Yh=new A.aZ("Go to home page",null,B.Uu,null,null,null,null,null,null)
+B.Yi=new A.aZ("You haven't claimed any letters to illustrate yet.\nVisit the mailboard to pick up a letter and start painting!",null,B.iZ,B.aY,null,null,null,null,null)
+B.Yj=new A.aZ("Upload a JPG, PNG, or WebP image (max 2 MB). This will appear on your profile and guestbook entries.",null,B.fQ,null,null,null,null,null,null)
+B.B4=new A.aZ("a place for letters & hand-drawn art",null,B.B_,null,null,null,null,null,null)
+B.Uv=new A.k(!0,null,null,"Arial",null,null,11,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.Yk=new A.aZ("Post anonymously (hide my username from the artist)",null,B.Uv,null,null,null,null,null,null)
+B.Yo=new A.aZ("Your Mailbox",null,B.cc,null,null,null,null,null,null)
+B.Yp=new A.aZ("Are you inspired by this letter? Pick it up to create an illustration for this stranger!",null,B.ep,null,null,null,null,null,null)
+B.Yq=new A.aZ("Page Not Found",null,B.iW,null,null,null,null,null,null)
+B.Ys=new A.aZ("Letters you have picked up to illustrate. Upload artwork to deliver your response.",null,B.fR,null,null,null,null,null,null)
+B.Yu=new A.aZ("Drop a Letter into the Mail Box",null,B.cc,null,null,null,null,null,null)
+B.Yv=new A.aZ("PUBLISHED TO PUBLIC GALLERY",null,B.AZ,null,null,null,null,null,null)
+B.Wb=new A.k(!0,B.dG,null,"Arial",null,null,16,B.L,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.mv=new A.aZ(".com",null,B.Wb,null,null,null,null,null,null)
+B.Yx=new A.aZ("Home",null,null,null,null,null,null,null,null)
+B.W0=new A.k(!0,B.bz,null,"Arial",null,null,10,null,null,null,null,null,null,null,null,null,null,B.az,null,null,null,null,null,null,null,null)
+B.Yz=new A.aZ("[delete]",null,B.W0,null,null,null,null,null,null)
+B.YE=new A.aZ("You haven't posted any letters yet.\nDrop a letter on the mailboard and an artist will illustrate it for you!",null,B.iZ,B.aY,null,null,null,null,null)
+B.YF=new A.aZ("Browse open letters from strangers. Claim one to illustrate and return original art.",null,B.fR,null,null,null,null,null,null)
+B.YH=new A.aZ("Artwork uploaded. Loading preview...",null,B.ep,null,null,null,null,null,null)
 B.EE=new A.u(1,0.4666666666666667,0.6,0.8,B.e)
 B.X7=new A.k(!0,B.EE,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.B5=new A.aZ(" | ",null,B.X7,null,null,null,null,null,null)
