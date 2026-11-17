@@ -2,11 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import '../api/api_config.dart';
 import '../api/notifications_api.dart';
 import '../models/notification_item.dart';
 import '../models/json_parse.dart';
-
-const String kWsBaseUrl = 'ws://localhost:3000';
 
 class NotificationProvider extends ChangeNotifier {
   final NotificationsApi _api = NotificationsApi();
