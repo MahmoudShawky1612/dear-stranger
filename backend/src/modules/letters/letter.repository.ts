@@ -1,4 +1,4 @@
-import { prisma } from "../../lib/prisma.js";
+﻿import { prisma } from "../../lib/prisma.js";
 import type { CreateLetterInput } from "./letter.schema.js";
 
 export const createLetter = (
@@ -323,6 +323,20 @@ export const findClaimedLettersByArtist = (
       _count: {
         select: { replies: true },
       },
+    },
+  });
+};
+export const unclaimLetter = (letterId: number, artistId: number) => {
+  return prisma.letter.updateManyAndReturn({
+    where: {
+      id: letterId,
+      status: "CLAIMED",
+      artistId,
+    },
+    data: {
+      status: "AVAILABLE",
+      artistId: null,
+      claimedAt: null,
     },
   });
 };

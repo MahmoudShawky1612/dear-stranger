@@ -1,10 +1,10 @@
-import express, { Router } from "express";
+﻿import express, { Router } from "express";
 import {
   optionalAuthentication,
   requireAuthentication,
 } from "../../middleware/auth.middleware.js";
 import {
-  claimLetterController,
+  claimLetterController, unclaimLetterController,
   completeArtworkDeliveryController,
   createArtworkUploadUrlController,
   uploadArtworkDirectController,
@@ -46,6 +46,7 @@ router.get(
 router.get("/:id", requireAuthentication, getLetterController);
 
 router.post("/:id/claim", requireAuthentication, claimLetterController);
+router.post("/:id/unclaim", requireAuthentication, unclaimLetterController);
 
 router.post(
   "/:id/artwork/upload-url",
